@@ -350,6 +350,106 @@ const RUTINA = {
           ]
         }
       ]
+    },
+    {
+      nombre: "Día 4 · Pecho y espalda",
+      // Como el Día 3: sin objetivo/duración/intensidad en el PDF, y con reglas propias.
+      reglas: [
+        "Nada al fallo. Si dudás, elegí la carga más baja.",
+        "RIR: al terminar la serie preguntate \"¿cuántas más me salían con buena técnica?\". Ese número es el RIR.",
+        "Dolor en el hombro, el codo o la lumbar: parás el ejercicio y me avisás. El cansancio muscular sí es normal."
+      ],
+      bloques: [
+        {
+          nombre: "Calentamiento",
+          nota: "Hacelo en este orden, de arriba hacia abajo.",
+          ejercicios: [
+            { nombre: "Movilidad articular general", descripcion: { musculos: "Lubricar las articulaciones y preparar el cuerpo para moverse.", pasos: ["Empezá por los tobillos: círculos hacia un lado y hacia el otro.", "Seguí subiendo: rodillas, cadera, columna, hombros, codos y muñecas.", "Movimientos suaves y amplios, sin forzar. Cuello solo hacia los lados."] }, dosis: "2-3 min", nota: "De abajo hacia arriba, suave. Más tiempo en hombros y columna." },
+            { nombre: "Remo suave", descripcion: { musculos: "Entrar en calor con todo el cuerpo.", pasos: ["Pies atados en los apoyos, agarrá el manillar.", "Ida: piernas → tronco → brazos. Vuelta: brazos → tronco → piernas.", "Ritmo cómodo: tenés que poder hablar sin problema."] }, dosis: "5 min", nota: "Ritmo cómodo: tenés que poder hablar sin problema." },
+            { nombre: "Rotaciones torácicas en cuadrupedia", descripcion: { musculos: "Movilizar la parte alta de la columna antes de los presses y los remos.", pasos: ["En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.", "Llevá una mano a la nuca.", "Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada. Volvé y repetí."] }, dosis: "6 por lado", nota: "Una mano en la nuca. Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada." },
+            { nombre: "Gato-vaca", descripcion: { musculos: "Movilizar toda la columna, vértebra por vértebra.", pasos: ["En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.", "Exhalá y redondeá la espalda hacia arriba, mentón hacia el pecho.", "Inhalá y hundí la espalda suave, mirada hacia adelante.", "Alterná lento, sin llegar al tope del movimiento."] }, dosis: "8 ciclos", nota: "Redondeá la espalda hacia arriba y después hundila suave. Lento y sin llegar al tope." },
+            { nombre: "Activación de dorsal con banda", descripcion: { musculos: "Activar el dorsal ancho y aprender a bajar el hombro antes de los tirones.", pasos: ["Banda atada a la altura de la cadera, de frente al poste.", "Brazo estirado adelante, agarrando la banda.", "Llevá la mano hacia atrás, hacia el bolsillo, con el brazo estirado y el hombro lejos de la oreja.", "Volvé lento. Completá las reps y cambiá de brazo."] }, dosis: "2 × 10 por lado", nota: "Banda a la altura de la cadera, brazo estirado. Llevá la mano hacia el \"bolsillo\" con el hombro lejos de la oreja." },
+            { nombre: "Plancha frontal + lateral", descripcion: { musculos: "Activar la zona media antes de cargar peso.", pasos: ["Frontal: antebrazos y puntas de los pies apoyados, cuerpo en línea recta de cabeza a talones.", "Sin descansar, girá hacia un costado: un antebrazo apoyado, pies uno sobre otro, cadera arriba.", "Pasá al otro lado. Abdomen firme y sin dejar caer la cadera."] }, dosis: "2 series · 30 s cada posición", nota: "Seguidas: frontal, lateral derecha y lateral izquierda. Abdomen firme." }
+          ]
+        },
+        {
+          nombre: "Trabajo principal · Pecho",
+          principal: true,
+          ejercicios: [
+            {
+              nombre: "Press banca plano con barra",
+              descripcion: { musculos: "Pecho, hombro anterior y tríceps.", pasos: ["Acostate en el banco con los ojos debajo de la barra y los pies apoyados en el piso.", "Agarrá la barra un poco más ancho que los hombros y juntá las escápulas.", "Sacá la barra del rack y llevala sobre los hombros con los brazos estirados.", "Bajala controlada hasta tocar el pecho y empujá hasta volver a estirar los brazos."] }, destacado: true,
+              series: "4", reps: "6", carga: "60 kg", rir: "~5", descanso: "2 min",
+              previo: "Antes: barra × 10, 40 kg × 5 y 50 kg × 3. El peso es de referencia: tienen que sobrarte varias repeticiones.",
+              indicaciones: [
+                "Pies firmes, escápulas juntas y apoyadas en el banco.",
+                "Bajá la barra controlada a la parte media-baja del pecho y empujá sin perder la posición."
+              ]
+            },
+            {
+              nombre: "Aperturas con mancuernas",
+              descripcion: { musculos: "Pecho y hombro anterior.", pasos: ["Acostado en banco plano, mancuernas arriba del pecho con las palmas enfrentadas.", "Codos levemente flexionados: esa flexión no cambia en todo el movimiento.", "Abrí los brazos en arco hacia los costados hasta la línea del hombro.", "Volvé por el mismo arco hasta juntar las mancuernas sobre el pecho."] },
+              series: "4", reps: "8", carga: "Según RIR", rir: "2-3", descanso: "90 s",
+              indicaciones: ["Codos levemente flexionados durante todo el movimiento.", "Bajá solo hasta la línea del hombro, sin forzar el estiramiento."]
+            },
+            {
+              nombre: "Cruce de poleas de arriba hacia abajo",
+              descripcion: { musculos: "Pecho (sobre todo la parte baja) y hombro anterior.", pasos: ["Poleas en lo alto, un agarre en cada mano. Parate en el medio con un pie adelante y el tronco apenas inclinado.", "Brazos abiertos y codos levemente flexionados.", "Llevá las manos en arco hacia abajo y adelante hasta juntarlas frente a la cadera.", "Volvé lento hasta abrir los brazos, sin que las poleas te tiren hacia atrás."] },
+              series: "3", reps: "12", carga: "Según RIR", rir: "2", descanso: "60-75 s",
+              indicaciones: ["Poleas arriba, un pie adelante. Llevá las manos hacia abajo y adelante hasta juntarlas frente a la cadera.", "Apretá el pecho 1 segundo abajo y volvé lento."]
+            }
+          ]
+        },
+        {
+          nombre: "Trabajo principal · Espalda",
+          principal: true,
+          ejercicios: [
+            {
+              nombre: "Remo con barra · codos pegados",
+              descripcion: { musculos: "Dorsal ancho, espalda media y bíceps; zona media y lumbar como estabilizadoras.", pasos: ["De pie, barra agarrada con las palmas hacia abajo, al ancho de los hombros.", "Flexioná un poco las rodillas e inclinate desde la cadera hasta unos 45°, espalda neutra.", "Tirá la barra hacia el abdomen con los codos pegados al cuerpo.", "Bajá controlado hasta estirar los brazos, sin mover el tronco."] },
+              series: "4", reps: "8", carga: "45 kg", rir: "4", descanso: "2 min",
+              indicaciones: [
+                "Palmas hacia abajo, al ancho de los hombros. Tronco a unos 45° y rodillas levemente flexionadas.",
+                "Tirá la barra hacia el abdomen, debajo del ombligo, con los codos pegados al cuerpo.",
+                "Bracing todo el tiempo: la espalda no se redondea ni se arquea. Bajá controlado."
+              ]
+            },
+            {
+              nombre: "Jalón al pecho",
+              descripcion: { musculos: "Dorsal ancho, espalda media y bíceps.", pasos: ["Sentate en la máquina con los muslos trabados bajo los apoyos.", "Agarrá la barra un poco más ancho que los hombros.", "Tirá la barra hacia la parte alta del pecho llevando los codos hacia abajo y volvé lento hasta estirar los brazos."] },
+              series: "4", reps: "10", carga: "45 kg", rir: "2-3", descanso: "90 s",
+              indicaciones: ["Hombros lejos de las orejas. Llevá los codos hacia abajo.", "Barra a la parte alta del pecho, sin balancear el tronco. Vuelta lenta."]
+            },
+            {
+              nombre: "Remo en polea baja · barra ancha, codos abiertos",
+              descripcion: { musculos: "Espalda media y alta (romboides y trapecio medio) y hombro posterior.", pasos: ["Sentate frente a la polea con los pies apoyados y las rodillas levemente flexionadas.", "Agarrá la barra ancha con las palmas hacia abajo, brazos estirados y espalda erguida.", "Tirá hacia la parte baja del pecho abriendo los codos hacia los costados.", "Volvé lento hasta estirar los brazos, sin inclinar el tronco."] },
+              series: "3", reps: "12", carga: "Según RIR", rir: "2", descanso: "75 s",
+              indicaciones: ["Sentado, espalda erguida. Agarre ancho con las palmas hacia abajo.", "Tirá hacia la parte baja del pecho con los codos abiertos. Pausa de 1 segundo juntando las escápulas y vuelta lenta, sin balancear el tronco."]
+            }
+          ]
+        },
+        {
+          // Bloque simple (sin registro): el PDF no pide anotar el core.
+          nombre: "Core",
+          nota: "En este orden. Si se arquea la espalda, frená.",
+          ejercicios: [
+            { nombre: "Stir the pot", descripcion: { musculos: "Estabilidad de la zona media: el tronco resiste mientras los brazos se mueven.", pasos: ["Antebrazos apoyados sobre la fitball y pies atrás, en posición de plancha.", "Cuerpo en línea recta y abdomen firme.", "Dibujá círculos chicos con los antebrazos moviendo la pelota, como si revolvieras una olla.", "20 s hacia un lado y 20 s hacia el otro."] }, dosis: "2 series · 20 s por lado", nota: "El tronco no se mueve. 45 s de descanso." },
+            { nombre: "Rueda abdominal", descripcion: { musculos: "Zona media completa, sobre todo el recto abdominal trabajando contra la extensión de la lumbar.", pasos: ["De rodillas, con la rueda en el piso debajo de los hombros.", "Abdomen apretado y pelvis levemente metida.", "Avanzá la rueda estirando el cuerpo hasta donde la lumbar no se hunda.", "Volvé tirando con el abdomen, no con la cadera."] }, dosis: "2 × 8", nota: "Desde rodillas. Avanzá solo hasta donde la lumbar no se hunde y volvé con el abdomen. 60 s de descanso." },
+            { nombre: "Circuito de zona baja", descripcion: { musculos: "Abdomen (parte baja) y flexores de cadera, con la lumbar pegada al piso.", pasos: ["Hollow hold: boca arriba, lumbar pegada al piso, hombros y piernas despegados del suelo. Quedate quieto.", "Pataditas cortas: misma posición, piernas estiradas moviéndose arriba y abajo, alternadas y cortitas.", "Tijeras cruzadas: piernas estiradas que se cruzan una sobre otra hacia los costados.", "Si la lumbar se despega, subí más las piernas."] }, dosis: "3 vueltas · 20 s trabajo / 10 s descanso", nota: "Hollow hold → pataditas cortas → tijeras cruzadas. 45 s entre vueltas. Lumbar pegada al piso: si se despega, subí las piernas." }
+          ]
+        },
+        {
+          nombre: "Estiramientos",
+          nota: "Tensión cómoda, sin rebotes y respirando lento.",
+          ejercicios: [
+            { nombre: "Pectoral en pared", descripcion: { musculos: "Estirar pecho y parte delantera del hombro.", pasos: ["Apoyá el antebrazo en una pared o marco de puerta, codo a la altura del hombro.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el pecho."] }, dosis: "30 s por lado" },
+            { nombre: "Dorsal ancho sobre banco", descripcion: { musculos: "Estirar la espalda (dorsales).", pasos: ["De rodillas frente a un banco, apoyá las manos en él.", "Llevá la cadera hacia atrás y dejá bajar el pecho hacia el piso."] }, dosis: "30-45 s", nota: "Manos en el banco, llevá la cadera atrás y dejá bajar el pecho." },
+            { nombre: "Brazo cruzado delante del pecho", descripcion: { musculos: "Estirar la parte de atrás del hombro.", pasos: ["Cruzá un brazo estirado por delante del pecho.", "Con el otro brazo acercalo hacia el cuerpo, sin subir el hombro."] }, dosis: "30 s por brazo", nota: "Parte de atrás del hombro." },
+            { nombre: "Bíceps en pared", descripcion: { musculos: "Estirar el bíceps y la parte delantera del hombro.", pasos: ["De costado a una pared, apoyá la palma con el brazo estirado a la altura del hombro o un poco más abajo, dedos hacia atrás.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el bíceps."] }, dosis: "30 s por brazo" },
+            { nombre: "Child's Pose", descripcion: { musculos: "Relajar y estirar suave la espalda.", pasos: ["De rodillas, sentate sobre los talones.", "Llevá el tronco hacia adelante y estirá los brazos en el piso.", "Frente apoyada y respiración lenta."] }, dosis: "30-45 s", nota: "Para relajar la espalda después de los remos." }
+          ]
+        }
+      ]
     }
   ]
 };
