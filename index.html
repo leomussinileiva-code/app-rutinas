@@ -87,6 +87,8 @@
   }
   textarea { min-height: 70px; resize: vertical; }
   .fila-rir { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: center; font-size: 13px; color: var(--suave); margin-top: 4px; }
+  .fila-serie.con-rir { grid-template-columns: 54px 1fr 1fr 1fr; }
+  .fila-anotar { display: grid; grid-template-columns: 1fr 110px; gap: 6px; align-items: center; font-size: 13px; color: var(--suave); margin-bottom: 6px; }
   .boton {
     display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; margin-top: 10px;
     font-size: 16px; font-weight: 600; cursor: pointer; background: var(--acento); color: white;
@@ -451,6 +453,101 @@ const RUTINA = {
         }
       ]
     }
+    ,
+    {
+      nombre: "Día 5 · WOD viernes",
+      objetivo: "Un cardio exigente: que te ahogues y te cueste, pero sin terminar destruido. Antes, el peso muerto rumano con la técnica fresca. Después: sábado y domingo libres.",
+      duracion: "~60 min",
+      // NUEVO: preguntas "antes de empezar". Se anotan igual que cualquier campo y salen en el resumen.
+      antes: [
+        { etiqueta: "¿Cómo llegaste? Dolor muscular de la búlgara (0-10)", placeholder: "0-10" }
+      ],
+      bloques: [
+        {
+          nombre: "Calentamiento",
+          ejercicios: [
+            { nombre: "Bici suave", descripcion: { musculos: "Subir la temperatura corporal y encontrar el ritmo suave que vas a usar en los intervalos.", pasos: ["Ajustá el sillín: con el pedal abajo, la rodilla queda apenas flexionada.", "Resistencia baja. Contá cuántas veces baja el pie derecho en 10 s."] }, dosis: "5 min", nota: "Resistencia baja, RPE 3-4. Contá cuántas veces baja el pie derecho en 10 s: 10-12 es el ritmo suave que vas a usar después." },
+            { nombre: "Movilidad de la rana", descripcion: { musculos: "Movilizar la cadera y estirar los aductores (cara interna del muslo).", pasos: ["En cuatro apoyos, abrí las rodillas todo lo que puedas cómodo, pies hacia afuera.", "Manos o antebrazos apoyados en el piso.", "Llevá la cadera hacia atrás, hacia los talones, y volvé hacia adelante.", "Balanceo suave, sin rebotar ni forzar."] }, dosis: "10 balanceos", nota: "Que se mueva la cadera, no la zona lumbar: la espalda queda recta." },
+            // Los pasos de la caminata del elefante son TUYOS (vienen del PDF), no un borrador.
+            { nombre: "Caminata del elefante", descripcion: { musculos: "Estirar la parte de atrás de los muslos y los gemelos, y activar hombros y zona media.", pasos: ["De pie, flexioná el tronco y apoyá las manos en el piso, lo más cerca de los pies que puedas. Si no llegás, flexioná un poco las rodillas.", "Subí la cadera bien alta: el cuerpo queda como una \"V\" invertida.", "Sin bajar la cadera, avanzá caminando con manos y pies: mano derecha y pie izquierdo, después mano izquierda y pie derecho. Pasos cortos.", "Mantené las piernas lo más estiradas que puedas: vas a sentir que tira detrás de los muslos y en los gemelos.", "Lento y sin rebotes. Si te tira la zona lumbar, flexioná un poco las rodillas."] }, dosis: "2 × 10 m", nota: "Cadera alta, forma de \"V\" invertida (no como plancha). Volvé caminando normal entre las dos pasadas." },
+            { nombre: "Bisagra de cadera sin peso", descripcion: { musculos: "Ensayar el gesto del peso muerto rumano: mover la cadera sin mover la espalda.", pasos: ["De pie, pies al ancho de cadera, manos en la cintura.", "Rodillas apenas flexionadas y fijas.", "Llevá la cadera hacia atrás inclinando el tronco con la espalda recta, hasta sentir tensión detrás del muslo.", "Volvé a la posición inicial apretando glúteos."] }, dosis: "10", nota: "Rodillas apenas flexionadas, cadera atrás con la espalda recta y volvé apretando glúteos." },
+            { nombre: "Puente de glúteos", descripcion: { musculos: "Activar glúteos y preparar la extensión de cadera.", pasos: ["Acostado boca arriba, rodillas flexionadas y plantas apoyadas.", "Subí la pelvis apretando los glúteos hasta formar una línea de rodillas a hombros.", "Bajá lento sin arquear la zona lumbar."] }, dosis: "12", nota: "Apretá glúteos arriba y bajá controlado." },
+            { nombre: "Rumano de aproximación", descripcion: { musculos: "Preparar el peso muerto rumano con poca carga.", pasos: ["Mismo gesto que el trabajo principal: rodillas apenas flexionadas, cadera atrás y barra pegada a las piernas."] }, dosis: "Barra sola × 8 · 40 kg × 6", nota: "Mismo gesto que el trabajo principal, con poca carga." }
+          ]
+        },
+        {
+          nombre: "Peso muerto rumano",
+          principal: true,
+          ejercicios: [
+            {
+              nombre: "Peso muerto rumano",
+              descripcion: { musculos: "Isquiosurales y glúteos; espalda y zona media como estabilizadoras.", pasos: ["De pie, barra agarrada con las palmas hacia vos, al ancho de los hombros, apoyada en los muslos.", "Rodillas apenas flexionadas: esa flexión no cambia en todo el movimiento.", "Llevá la cadera hacia atrás y bajá la barra pegada a las piernas, con la espalda recta.", "Cuando no puedas bajar más sin redondear la espalda, volvé empujando la cadera hacia adelante y apretando glúteos."] }, destacado: true,
+              series: "4", reps: "10", carga: "50-60 kg", rir: "3-4", descanso: "2 min",
+              rirPorSerie: true,   // NUEVO: el PDF pide el RIR de cada serie, no solo de la última
+              previo: "Bajada en 3 segundos, sintiendo el estiramiento detrás del muslo. Subida normal. Si te sobran muchas y la técnica sale perfecta, subí 5-10 kg en la segunda serie.",
+              indicaciones: [
+                "Rodillas apenas flexionadas y fijas: no es una sentadilla.",
+                "Cadera hacia atrás, como si cerraras una puerta con la cola.",
+                "Barra pegada a las piernas todo el recorrido.",
+                "Bajá hasta donde la espalda sigue recta (normalmente un poco por debajo de las rodillas). No hace falta llegar al piso.",
+                "Arriba apretá glúteos, sin echar el tronco hacia atrás.",
+                "Regla de corte: si sentís que se te redondea la espalda o que la bajada se te acorta, terminá la serie ahí, aunque falten repeticiones."
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "Bici 30/30",
+          nota: "Primero elegís tu nivel y después hacés el bloque principal con ese nivel.",
+          ejercicios: [
+            {
+              nombre: "Paso 1 · Elegí tu nivel",
+              descripcion: { musculos: "Encontrar la resistencia justa para los intervalos: fuerte, pero sostenible.", pasos: ["Hacé 3 tramos de 20 s rápidos, subiendo la resistencia en cada uno.", "Entre tramos, 40 s suaves.", "Quedate con el nivel del tramo que se sintió fuerte, pero que podías aguantar más."] },
+              dosis: "3 × 20 s",
+              nota: "20 s rápidos (unas 15-17 pedaladas en 10 s) y 40 s suaves entre tramos. Elegí el nivel del tramo que se sintió fuerte, pero que podías aguantar más.",
+              // NUEVO: campos para anotar en un ejercicio que no tiene series ni kg
+              anotar: [ { etiqueta: "Nivel o resistencia que elegiste", placeholder: "nivel" } ]
+            },
+            {
+              nombre: "Paso 2 · El bloque principal",
+              descripcion: { musculos: "Trabajo cardiovascular exigente por intervalos.", pasos: ["30 s fuerte con el nivel que elegiste, lo más rápido que puedas sostener en los 15 tramos.", "30 s suave: resistencia baja, sin dejar de pedalear.", "Repetí hasta completar 15 tramos (15 min)."] },
+              dosis: "15 tramos · 30 s fuerte + 30 s suave · 15 min",
+              indicaciones: [
+                "No salgas a fondo en los primeros tramos. Al principio va a parecer fácil.",
+                "Desde la mitad te vas a empezar a ahogar y te va a costar mantener el ritmo. Eso es lo que buscamos.",
+                "En los últimos tramos, sostené el ritmo aunque cueste.",
+                "Una sola regla: si los primeros 3 tramos te resultan fáciles, subí un nivel. Después no toques más nada."
+              ],
+              anotar: [
+                { etiqueta: "Tramo 1 · distancia o rpm (si la bici lo muestra)", placeholder: "—" },
+                { etiqueta: "Tramo 15 · distancia o rpm (si la bici lo muestra)", placeholder: "—" },
+                { etiqueta: "¿En qué tramo empezó a costar?", placeholder: "nº de tramo" }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "Core",
+          ejercicios: [
+            { nombre: "Pesa rusa en el pecho + elevación de rodilla", descripcion: { musculos: "Zona media (sobre todo oblicuos) resistiendo la inclinación y la rotación; flexores de cadera.", pasos: ["De pie, pesa en posición de rack: manija en la palma, la pesa apoyada sobre el antebrazo y contra el pecho.", "Codo pegado a las costillas y muñeca recta. La pesa no se separa del cuerpo.", "Subí la rodilla del lado contrario, recta hacia adelante, y bajala. Repetí en el lugar.", "El tronco queda quieto: no se inclina ni gira.", "A los 45 s cambiá la pesa de lado y la pierna."] }, dosis: "2 rondas · 45 s por lado", nota: "Posición de rack: manija en la palma, la pesa sobre el antebrazo y contra el pecho, codo pegado a las costillas y muñeca recta. La pesa no se separa del cuerpo. El tronco no se inclina ni gira. Descanso: 30 s entre rondas. Carga: 12-16 kg.", anotar: [ { etiqueta: "Kg", placeholder: "kg" } ] },
+            { nombre: "Pesa rusa arriba de la cabeza + elevación de rodilla", descripcion: { musculos: "Zona media y estabilidad del hombro con el brazo arriba; flexores de cadera.", pasos: ["De pie, pesa rusa arriba con el brazo extendido y pegado a la oreja.", "La pesa queda apoyada sobre el dorso del antebrazo, con la muñeca recta.", "Costillas abajo y abdomen firme.", "Subí la rodilla del lado contrario, recta hacia adelante, y bajala. Repetí en el lugar.", "A los 45 s cambiá de brazo y de pierna."] }, dosis: "2 rondas · 45 s por lado", nota: "Pesa apoyada sobre el dorso del antebrazo y muñeca recta. Costillas abajo y abdomen firme. Si para subir el brazo tenés que arquear la espalda, bajá el peso. Carga: 8-12 kg.", anotar: [ { etiqueta: "Kg", placeholder: "kg" } ] },
+            { nombre: "Tuck L-sit en el cajón", descripcion: { musculos: "Zona media, flexores de cadera y depresores del hombro (hombros abajo).", pasos: ["Sentado sobre el cajón, apoyá las manos al costado de la cadera.", "Brazos estirados y hombros abajo, lejos de las orejas.", "Empujá el cajón, despegá la cola y llevá las rodillas flexionadas hacia el pecho.", "Sostené la posición."] }, dosis: "3 × 20 s acumulados", nota: "Si se te caen, descansá unos segundos y completá los 20 s. Descanso: 40 s. Si sentís tirón en la zona lumbar, pará.", anotar: [ { etiqueta: "Segundos seguidos en la mejor serie", placeholder: "s" } ] }
+          ]
+        },
+        {
+          nombre: "Estiramientos",
+          nota: "Tensión cómoda, sin rebotes y respirando lento.",
+          ejercicios: [
+            { nombre: "Isquiosurales sentado", descripcion: { musculos: "Estirar la parte de atrás del muslo.", pasos: ["Sentado en el piso con una pierna estirada y la otra flexionada.", "Espalda recta: avanzá con el tronco hacia el pie de la pierna estirada desde la cadera.", "Pará donde sientas tensión, sin redondear la espalda."] }, dosis: "30 s por pierna", nota: "Pierna estirada, avanzá con el tronco recto." },
+            { nombre: "Figure Four (glúteos)", descripcion: { musculos: "Estirar glúteos y cadera.", pasos: ["Acostado boca arriba, apoyá un tobillo sobre la rodilla contraria (forma de 4).", "Agarrá el muslo de la pierna de abajo y acercalo al pecho."] }, dosis: "30 s por lado" },
+            { nombre: "Flexores de cadera en media rodilla", descripcion: { musculos: "Estirar los flexores de cadera (parte de adelante de la cadera).", pasos: ["Una rodilla apoyada en el piso y la otra pierna adelante, con el pie apoyado.", "Meté la pelvis hacia adentro (como si llevaras la cola hacia abajo) y apretá el glúteo de la pierna de atrás.", "Llevá el cuerpo apenas hacia adelante hasta sentir tensión adelante de la cadera, sin arquear la lumbar."] }, dosis: "30 s por lado", nota: "Pelvis hacia adentro." },
+            { nombre: "Cuádriceps en pared", descripcion: { musculos: "Estirar la parte de adelante del muslo.", pasos: ["Arrodillate de espaldas a una pared y apoyá el empeine de una pierna en ella.", "Adelantá la otra pierna con el pie apoyado.", "Subí el tronco de a poco sin arquear la lumbar, hasta sentir tensión en el muslo."] }, dosis: "30 s por pierna" },
+            { nombre: "Gemelos en pared", descripcion: { musculos: "Estirar la pantorrilla (gemelos).", pasos: ["De frente a la pared, manos apoyadas.", "Una pierna adelante flexionada y la otra atrás estirada, con el talón pegado al piso.", "Llevá la cadera hacia la pared hasta sentir tensión en la pantorrilla de atrás."] }, dosis: "30 s por pierna", nota: "Pierna de atrás estirada." },
+            { nombre: "Postura del niño", descripcion: { musculos: "Relajar y estirar suave la espalda baja.", pasos: ["De rodillas, sentate sobre los talones.", "Llevá el tronco hacia adelante y estirá los brazos en el piso.", "Frente apoyada y respiración lenta."] }, dosis: "30-45 s" }
+          ]
+        }
+      ]
+    }
   ]
 };
 
@@ -503,25 +600,48 @@ function formularioRegistro(ej, idEj) {
   let filas = '';
   for (let s = 1; s <= cantidadSeries; s++) {
     filas += `
-      <div class="fila-serie">
+      <div class="fila-serie${ej.rirPorSerie ? ' con-rir' : ''}">
         <span>${nombreSerie} ${s}</span>
         <input inputmode="decimal" placeholder="kg" data-id="${idEj}-s${s}-peso">
         <input inputmode="numeric" placeholder="reps" data-id="${idEj}-s${s}-reps">
+        ${ej.rirPorSerie ? `<input inputmode="numeric" placeholder="RIR" data-id="${idEj}-s${s}-rir">` : ''}
       </div>`;
   }
+  // Si el ejercicio pide RIR en cada serie, no hace falta la fila de "RIR de la última"
+  const filaRir = ej.rirPorSerie ? '' : `
+      <div class="fila-rir">
+        <span>RIR de la última ${nombreSerie.toLowerCase()}</span>
+        <input inputmode="numeric" placeholder="RIR" data-id="${idEj}-rir">
+      </div>`;
   return `
     <div class="registro">
       <div class="registro-titulo">📝 Lo que hiciste</div>
       ${filas}
-      <div class="fila-rir">
-        <span>RIR de la última ${nombreSerie.toLowerCase()}</span>
-        <input inputmode="numeric" placeholder="RIR" data-id="${idEj}-rir">
-      </div>
+      ${filaRir}
+    </div>`;
+}
+
+/* ---------------------------------------------------------
+   CAMPOS PARA ANOTAR (nuevo en el Día 5)
+   Para lo que no son series × kg × reps: el nivel de la bici,
+   los kg de la pesa rusa, los segundos del L-sit...
+   Cada campo es un dato { etiqueta, placeholder }.
+   --------------------------------------------------------- */
+function camposAnotar(campos, idBase) {
+  if (!campos) return '';
+  return `
+    <div class="registro">
+      <div class="registro-titulo">📝 Anotá</div>
+      ${campos.map((c, k) => `
+        <div class="fila-anotar">
+          <span>${c.etiqueta}</span>
+          <input placeholder="${c.placeholder || ''}" data-id="${idBase}-a${k}">
+        </div>`).join('')}
     </div>`;
 }
 
 // Dibuja un ejercicio simple (calentamiento, cardio, estiramientos)
-function tarjetaSimple(ej) {
+function tarjetaSimple(ej, idEj) {
   return `
     <div class="tarjeta">
       <h3>${ej.nombre}</h3>
@@ -532,6 +652,12 @@ function tarjetaSimple(ej) {
         <p class="detalle"><b>Para qué:</b> ${ej.descripcion.musculos}</p>
         <ol>${ej.descripcion.pasos.map(p => `<li>${p}</li>`).join('')}</ol>
       </details>` : ''}
+      ${ej.indicaciones ? `
+      <details>
+        <summary>Indicaciones</summary>
+        <ul>${ej.indicaciones.map(i => `<li>${i}</li>`).join('')}</ul>
+      </details>` : ''}
+      ${camposAnotar(ej.anotar, idEj)}
     </div>`;
 }
 
@@ -546,6 +672,7 @@ function mostrarDia(indice) {
   if (dia.duracion) chips.push(`⏱ ${dia.duracion}`);
   if (dia.intensidad) chips.push(`💪 ${dia.intensidad}`);
   if (chips.length) html += `<div class="resumen">${chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>`;
+  if (dia.antes) html += `<h2>Antes de empezar</h2><div class="tarjeta">${camposAnotar(dia.antes, `d${indice}-antes`)}</div>`;
 
   dia.bloques.forEach((bloque, b) => {
     html += `<h2>${bloque.nombre}</h2>`;
@@ -553,7 +680,7 @@ function mostrarDia(indice) {
     bloque.ejercicios.forEach((ej, e) => {
       // idEj identifica cada ejercicio de forma única: "d0-b1-e0" = día 0, bloque 1, ejercicio 0
       const idEj = `d${indice}-b${b}-e${e}`;
-      html += bloque.principal ? tarjetaPrincipal(ej, idEj) : tarjetaSimple(ej);
+      html += bloque.principal ? tarjetaPrincipal(ej, idEj) : tarjetaSimple(ej, idEj);
     });
   });
 
@@ -625,15 +752,31 @@ function generarResumen(indice) {
   const fecha = new Date().toLocaleDateString('es-ES');
   let texto = `${RUTINA.cliente} · ${dia.nombre} · ${fecha}\n`;
 
+  // Campos anotados: cada uno sale como "• Etiqueta: valor" (solo si se completó)
+  const lineasAnotadas = (campos, idBase) => (campos || [])
+    .map((c, k) => [c.etiqueta, valor(`${idBase}-a${k}`)])
+    .filter(([, v]) => v)
+    .map(([etiqueta, v]) => `\n• ${etiqueta}: ${v}`).join('');
+
+  texto += lineasAnotadas(dia.antes, `d${indice}-antes`);
+
   dia.bloques.forEach((bloque, b) => {
-    if (!bloque.principal) return;
+    if (!bloque.principal) {
+      bloque.ejercicios.forEach((ej, e) => {
+        const idEj = `d${indice}-b${b}-e${e}`;
+        const anotado = lineasAnotadas(ej.anotar, idEj);
+        if (anotado) texto += `\n${ej.nombre}${anotado.replace(/\n• /g, '\n   – ')}`;
+      });
+      return;
+    }
     bloque.ejercicios.forEach((ej, e) => {
       const idEj = `d${indice}-b${b}-e${e}`;
       const series = [];
       for (let s = 1; s <= (parseInt(ej.series) || 3); s++) {
         const peso = valor(`${idEj}-s${s}-peso`);
         const reps = valor(`${idEj}-s${s}-reps`);
-        if (peso || reps) series.push(`${peso || '?'}×${reps || '?'}`);
+        const rirSerie = ej.rirPorSerie ? valor(`${idEj}-s${s}-rir`) : '';
+        if (peso || reps) series.push(`${peso || '?'}×${reps || '?'}${rirSerie ? ` (RIR ${rirSerie})` : ''}`);
       }
       const rir = valor(`${idEj}-rir`);
       const prefijo = ej.grupo ? `${ej.grupo} ` : '';
