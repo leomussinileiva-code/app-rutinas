@@ -76,6 +76,14 @@
   .video { display: inline-block; margin-top: 10px; font-size: 14px; color: var(--acento); }
 
   .reglas { background: #fff8e6; border-color: #f0e2b8; }
+  .reglas p { margin: 0 0 4px; font-size: 14px; }
+
+  /* Etapa 6: selector de etapa, ejercicio nuevo, secciones de la descripción y recuadro de cierre */
+  .selector-etapa { margin-top: 10px; width: auto; max-width: 100%; font-size: 15px; padding: 6px 8px; background: rgba(255,255,255,.95); border: 0; }
+  .etiqueta.nuevo { background: #b54708; }
+  .seccion-titulo { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--acento); margin: 10px 0 2px; }
+  .cierre { background: var(--acento-claro); border-color: #c9e0d1; font-size: 14px; }
+  .cierre b { display: block; margin-bottom: 4px; }
 
   /* ---- Registro de series (Fase 2) ---- */
   .registro { margin-top: 12px; border-top: 1px dashed var(--borde); padding-top: 10px; }
@@ -103,7 +111,7 @@
 <header>
   <small id="etapa-subtitulo"></small>
   <h1 id="cliente"></h1>
-  <p id="etapa-nombre"></p>
+  <select id="selector-etapa" class="selector-etapa" onchange="elegirEtapa(this.value)" aria-label="Elegir etapa"></select>
 </header>
 <nav class="tabs" id="tabs"></nav>
 <main id="contenido"></main>
@@ -114,11 +122,1547 @@
    Esta es la parte que vos vas a entender primero: es tu PDF,
    pero ordenado. Más adelante esto vivirá en una base de datos.
    ========================================================= */
-const RUTINA = {
-  cliente: "Rodrigo",
-  etapa: "Semana de adaptación",
+const CLIENTE = "Rodrigo";
+
+/* ---------------------------------------------------------
+   BIBLIOTECA DE EJERCICIOS
+   Cada ejercicio se escribe UNA vez, con un id fijo (ej: "jalon-pecho").
+   Ese id es el que se guarda en Supabase (series.ejercicio_id).
+   - familia: agrupa variantes (rumano con barra / con mancuernas).
+     Variante = otro ejercicio si cambia la técnica o si los kg no son comparables.
+   - categoria, patron, musculos, material: para buscar y planificar.
+   - precauciones: etiquetas (para filtrar) + nota (el detalle).
+   - videos: lista de links tuyos; si está vacía, la app busca en YouTube.
+   - revisar: true → falta tu revisión (patrón, músculos, precauciones, descripción).
+   --------------------------------------------------------- */
+const BIBLIOTECA = {
+  "activacion-dorsal-banda": {
+    nombre: "Activación de dorsal con banda",
+    categoria: "activación",
+    patron: ["tracción vertical"],
+    musculos: "Dorsal ancho",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Activar el dorsal ancho y aprender a bajar el hombro antes de los tirones.",
+      pasos: [
+        "Banda atada a la altura de la cadera, de frente al poste.",
+        "Brazo estirado adelante, agarrando la banda.",
+        "Llevá la mano hacia atrás, hacia el bolsillo, con el brazo estirado y el hombro lejos de la oreja.",
+        "Volvé lento. Completá las reps y cambiá de brazo."
+      ]
+    },
+    revisar: true
+  },
+  "activacion-press-militar-banda": {
+    nombre: "Banda en press militar",
+    categoria: "activación",
+    patron: ["empuje vertical"],
+    musculos: "Hombro, zona media",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Activar la estabilidad del hombro y del tronco antes del press.",
+      pasos: [
+        "Banda atada a un poste a la altura de los hombros, de frente al poste.",
+        "Hacé el movimiento de press militar: la banda tira los brazos hacia adelante.",
+        "Mantené los brazos verticales; el cuerpo no se mueve."
+      ]
+    },
+    revisar: true
+  },
+  "bisagra-cadera-sin-peso": {
+    nombre: "Bisagra de cadera sin peso",
+    familia: "bisagra",
+    categoria: "activación",
+    patron: ["bisagra"],
+    musculos: "Isquiosurales, glúteos",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Ensayar el gesto del peso muerto rumano: mover la cadera sin mover la espalda.",
+      pasos: [
+        "De pie, pies al ancho de cadera, manos en la cintura.",
+        "Rodillas apenas flexionadas y fijas.",
+        "Llevá la cadera hacia atrás inclinando el tronco con la espalda recta, hasta sentir tensión detrás del muslo.",
+        "Volvé a la posición inicial apretando glúteos."
+      ]
+    },
+    revisar: true
+  },
+  "buenos-dias-palo": {
+    nombre: "Buenos días con palo",
+    familia: "bisagra",
+    categoria: "activación",
+    patron: ["bisagra"],
+    musculos: "Isquiosurales, glúteos, erectores",
+    material: ["palo"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Ensayar la bisagra de cadera del peso muerto rumano y entrar en calor los isquiosurales.",
+      pasos: [
+        "De pie, palo apoyado sobre la parte alta de la espalda, rodillas apenas flexionadas.",
+        "Llevá la cadera atrás inclinando el tronco con la espalda recta.",
+        "Cuando tire detrás del muslo, volvé apretando glúteos."
+      ]
+    },
+    revisar: true
+  },
+  "caminata-lateral-banda": {
+    nombre: "Caminata lateral con banda",
+    categoria: "activación",
+    patron: ["abducción de cadera"],
+    musculos: "Glúteo medio",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Activar el glúteo medio, que mantiene las rodillas alineadas en la sentadilla y al aterrizar.",
+      pasos: [
+        "Banda arriba de las rodillas, en media sentadilla.",
+        "Dá pasos cortos hacia un costado sin que los pies se junten del todo.",
+        "Completá los pasos y volvé hacia el otro lado."
+      ]
+    },
+    revisar: true
+  },
+  "elevaciones-talon": {
+    nombre: "Elevaciones de talón",
+    familia: "pantorrilla",
+    categoria: "activación",
+    patron: ["flexión plantar"],
+    musculos: "Gemelos, sóleo",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Entrar en calor pantorrillas y tobillos antes de saltar.",
+      pasos: ["De pie, pies al ancho de la cadera.", "Subí en puntas de pie lo más alto que puedas y bajá controlado."]
+    },
+    revisar: true
+  },
+  "puente-gluteos": {
+    nombre: "Puente de glúteos",
+    categoria: "activación",
+    patron: ["extensión de cadera"],
+    musculos: "Glúteos",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Activar glúteos y preparar la extensión de cadera.",
+      pasos: [
+        "Acostado boca arriba, rodillas flexionadas y plantas apoyadas.",
+        "Subí la pelvis apretando los glúteos hasta formar una línea de rodillas a hombros.",
+        "Bajá lento sin arquear la zona lumbar. Si la rutina dice \"sostenido\", quedate arriba el tiempo indicado."
+      ]
+    },
+    revisar: true
+  },
+  bici: {
+    nombre: "Bici",
+    categoria: "cardio",
+    patron: [],
+    musculos: "Cardiovascular, piernas",
+    material: ["bici estática"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Entrada en calor o trabajo aeróbico: la intensidad la marca la rutina de cada día.",
+      pasos: [
+        "Ajustá el sillín: con el pedal abajo, la rodilla queda apenas flexionada.",
+        "Pedaleá al ritmo que indica la rutina; regulá con la resistencia y la prueba del habla."
+      ]
+    },
+    revisar: true
+  },
+  caminata: {
+    nombre: "Caminata",
+    categoria: "cardio",
+    patron: [],
+    musculos: "Cardiovascular",
+    material: ["cinta"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Subir la temperatura corporal antes de mover peso.",
+      pasos: ["En cinta o en el lugar, a paso firme.", "Empezá suave y aumentá el ritmo de a poco."]
+    },
+    revisar: true
+  },
+  "remo-ergometro": {
+    nombre: "Remo (ergómetro)",
+    categoria: "cardio",
+    patron: [],
+    musculos: "Cardiovascular, todo el cuerpo",
+    material: ["remoergómetro"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Entrar en calor con todo el cuerpo.",
+      pasos: [
+        "Pies atados en los apoyos, agarrá el manillar.",
+        "Ida: piernas → tronco → brazos. Vuelta: brazos → tronco → piernas.",
+        "Ritmo cómodo: tenés que poder hablar sin problema."
+      ]
+    },
+    revisar: true
+  },
+  "circuito-zona-baja": {
+    nombre: "Circuito de zona baja",
+    categoria: "core",
+    patron: ["core antiextensión"],
+    musculos: "Abdomen, flexores de cadera",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Lumbar pegada al piso: si se despega, subir las piernas." },
+    videos: [],
+    descripcion: {
+      musculos: "Abdomen (parte baja) y flexores de cadera, con la lumbar pegada al piso.",
+      pasos: [
+        "Hollow hold: boca arriba, lumbar pegada al piso, hombros y piernas despegados del suelo. Quedate quieto.",
+        "Pataditas cortas: misma posición, piernas estiradas moviéndose arriba y abajo, alternadas y cortitas.",
+        "Tijeras cruzadas: piernas estiradas que se cruzan una sobre otra hacia los costados.",
+        "Si la lumbar se despega, subí más las piernas."
+      ]
+    },
+    revisar: true
+  },
+  "pesa-rusa-overhead-rodilla": {
+    nombre: "Pesa rusa arriba de la cabeza + elevación de rodilla",
+    familia: "pesa-rusa-rodilla",
+    categoria: "core",
+    patron: ["core antiflexión lateral"],
+    musculos: "Zona media, estabilidad del hombro, flexores de cadera",
+    material: ["pesa rusa"],
+    precauciones: { etiquetas: ["hombro", "lumbar"], nota: "Si para subir el brazo hay que arquear la espalda, bajar el peso." },
+    videos: [],
+    descripcion: {
+      musculos: "Zona media y estabilidad del hombro con el brazo arriba; flexores de cadera.",
+      pasos: [
+        "De pie, pesa rusa arriba con el brazo extendido y pegado a la oreja.",
+        "La pesa queda apoyada sobre el dorso del antebrazo, con la muñeca recta.",
+        "Costillas abajo y abdomen firme.",
+        "Subí la rodilla del lado contrario, recta hacia adelante, y bajala. Repetí en el lugar.",
+        "A los 45 s cambiá de brazo y de pierna."
+      ]
+    },
+    revisar: true
+  },
+  "pesa-rusa-rack-rodilla": {
+    nombre: "Pesa rusa en el pecho + elevación de rodilla",
+    familia: "pesa-rusa-rodilla",
+    categoria: "core",
+    patron: ["core antiflexión lateral", "core antirrotación"],
+    musculos: "Oblicuos, zona media, flexores de cadera",
+    material: ["pesa rusa"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Zona media (sobre todo oblicuos) resistiendo la inclinación y la rotación; flexores de cadera.",
+      pasos: [
+        "De pie, pesa en posición de rack: manija en la palma, la pesa apoyada sobre el antebrazo y contra el pecho.",
+        "Codo pegado a las costillas y muñeca recta. La pesa no se separa del cuerpo.",
+        "Subí la rodilla del lado contrario, recta hacia adelante, y bajala. Repetí en el lugar.",
+        "El tronco queda quieto: no se inclina ni gira.",
+        "A los 45 s cambiá la pesa de lado y la pierna."
+      ]
+    },
+    revisar: true
+  },
+  "plancha-frontal-lateral": {
+    nombre: "Plancha frontal + lateral",
+    categoria: "core",
+    patron: ["core antiextensión", "core antiflexión lateral"],
+    musculos: "Zona media",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Activar la zona media antes de cargar peso.",
+      pasos: [
+        "Frontal: antebrazos y puntas de los pies apoyados, cuerpo en línea recta de cabeza a talones.",
+        "Sin descansar, girá hacia un costado: un antebrazo apoyado, pies uno sobre otro, cadera arriba.",
+        "Pasá al otro lado. Abdomen firme y sin dejar caer la cadera."
+      ]
+    },
+    revisar: true
+  },
+  "rueda-abdominal": {
+    nombre: "Rueda abdominal",
+    categoria: "core",
+    patron: ["core antiextensión"],
+    musculos: "Recto abdominal, zona media",
+    material: ["rueda abdominal"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Avanzar solo hasta donde la lumbar no se hunde." },
+    videos: [],
+    descripcion: {
+      musculos: "Zona media completa, sobre todo el recto abdominal trabajando contra la extensión de la lumbar.",
+      pasos: [
+        "De rodillas, con la rueda en el piso debajo de los hombros.",
+        "Abdomen apretado y pelvis levemente metida.",
+        "Avanzá la rueda estirando el cuerpo hasta donde la lumbar no se hunda.",
+        "Volvé tirando con el abdomen, no con la cadera."
+      ]
+    },
+    revisar: true
+  },
+  "stir-the-pot": {
+    nombre: "Stir the pot",
+    categoria: "core",
+    patron: ["core antiextensión"],
+    musculos: "Zona media",
+    material: ["fitball"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Si se arquea la espalda, frenar." },
+    videos: [],
+    descripcion: {
+      musculos: "Estabilidad de la zona media: el tronco resiste mientras los brazos se mueven.",
+      pasos: [
+        "Antebrazos apoyados sobre la fitball y pies atrás, en posición de plancha.",
+        "Cuerpo en línea recta y abdomen firme.",
+        "Dibujá círculos chicos con los antebrazos moviendo la pelota, como si revolvieras una olla.",
+        "20 s hacia un lado y 20 s hacia el otro."
+      ]
+    },
+    revisar: true
+  },
+  "tuck-l-sit-cajon": {
+    nombre: "Tuck L-sit en el cajón",
+    categoria: "core",
+    patron: ["core antiextensión"],
+    musculos: "Zona media, flexores de cadera, depresores del hombro",
+    material: ["cajón"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Si hay tirón en la zona lumbar, parar." },
+    videos: [],
+    descripcion: {
+      musculos: "Zona media, flexores de cadera y depresores del hombro (hombros abajo).",
+      pasos: [
+        "Sentado sobre el cajón, apoyá las manos al costado de la cadera.",
+        "Brazos estirados y hombros abajo, lejos de las orejas.",
+        "Empujá el cajón, despegá la cola y llevá las rodillas flexionadas hacia el pecho.",
+        "Sostené la posición."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-apertura-toracica-banco": {
+    nombre: "Apertura torácica sobre banco",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Espalda alta y pecho",
+    material: ["banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Abrir la parte alta de la espalda y el pecho.",
+      pasos: [
+        "De rodillas frente a un banco, apoyá los codos en él con las manos juntas.",
+        "Llevá la cadera hacia atrás y dejá bajar el pecho, sintiendo la apertura en la espalda alta."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-biceps-pared": {
+    nombre: "Bíceps en pared",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Bíceps, hombro anterior",
+    material: ["pared"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar el bíceps y la parte delantera del hombro.",
+      pasos: [
+        "De costado a una pared, apoyá la palma con el brazo estirado a la altura del hombro o un poco más abajo, dedos hacia atrás.",
+        "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el bíceps."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-brazo-cruzado": {
+    nombre: "Brazo cruzado delante del pecho",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Hombro posterior",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte de atrás del hombro.",
+      pasos: ["Cruzá un brazo estirado por delante del pecho.", "Con el otro brazo acercalo hacia el cuerpo, sin subir el hombro."]
+    },
+    revisar: true
+  },
+  "estiramiento-cuadriceps-pared": {
+    nombre: "Cuádriceps en pared",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Cuádriceps",
+    material: ["pared"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte de adelante del muslo.",
+      pasos: [
+        "Arrodillate de espaldas a una pared y apoyá el empeine de una pierna en ella.",
+        "Adelantá la otra pierna con el pie apoyado.",
+        "Subí el tronco de a poco sin arquear la lumbar, hasta sentir tensión en el muslo."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-dorsal-banco": {
+    nombre: "Dorsal sobre banco",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Dorsal ancho",
+    material: ["banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la espalda (dorsales).",
+      pasos: ["De rodillas frente a un banco, apoyá los codos o las manos en él.", "Llevá la cadera hacia atrás y dejá bajar el pecho hacia el piso."]
+    },
+    revisar: true
+  },
+  "estiramiento-figure-four": {
+    nombre: "Figure Four",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Glúteos",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar glúteos y cadera.",
+      pasos: [
+        "Acostado boca arriba, apoyá un tobillo sobre la rodilla contraria (forma de 4).",
+        "Agarrá el muslo de la pierna de abajo y acercalo al pecho."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-flexor-cadera": {
+    nombre: "Flexor de cadera en media rodilla",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Flexores de cadera",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar los flexores de cadera (parte de adelante de la cadera).",
+      pasos: [
+        "Una rodilla apoyada en el piso y la otra pierna adelante, con el pie apoyado.",
+        "Meté la pelvis hacia adentro (como si llevaras la cola hacia abajo) y apretá el glúteo de la pierna de atrás.",
+        "Llevá el cuerpo apenas hacia adelante hasta sentir tensión adelante de la cadera, sin arquear la lumbar."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-gemelo-pared": {
+    nombre: "Gemelo en pared",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Gemelos, sóleo",
+    material: ["pared"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la pantorrilla (gemelos).",
+      pasos: [
+        "De frente a la pared, manos apoyadas.",
+        "Una pierna adelante flexionada y la otra atrás estirada, con el talón pegado al piso.",
+        "Llevá la cadera hacia la pared hasta sentir tensión en la pantorrilla de atrás."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-isquios-acostado-banda": {
+    nombre: "Isquiosurales acostado con banda",
+    familia: "estiramiento-isquios",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Isquiosurales",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte de atrás del muslo.",
+      pasos: [
+        "Acostado boca arriba, pasá la banda por la planta de un pie.",
+        "Subí esa pierna estirada tirando suave de la banda.",
+        "La otra pierna queda apoyada en el piso."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-isquios-sentado": {
+    nombre: "Isquiosurales sentado",
+    familia: "estiramiento-isquios",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Isquiosurales",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte de atrás del muslo.",
+      pasos: [
+        "Sentado en el piso con una pierna estirada y la otra flexionada.",
+        "Espalda recta: avanzá con el tronco hacia el pie de la pierna estirada desde la cadera.",
+        "Pará donde sientas tensión, sin redondear la espalda."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-isquios-sentado-banda": {
+    nombre: "Isquiosurales sentado con banda",
+    familia: "estiramiento-isquios",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Isquiosurales, gemelos",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte de atrás del muslo (isquiosurales) y la pantorrilla.",
+      pasos: [
+        "Sentado en el piso con una pierna estirada, pasá la banda por la planta de ese pie.",
+        "Espalda larga; tirá suave de la banda llevando la punta del pie hacia vos.",
+        "Si no sentís tensión, inclinate un poco hacia adelante desde la cadera."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-mariposa": {
+    nombre: "Mariposa",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Aductores",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la cara interna del muslo.",
+      pasos: [
+        "Sentado, juntá las plantas de los pies y dejá caer las rodillas hacia los costados.",
+        "Espalda larga. Podés empujar suave las rodillas hacia abajo con los codos."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-pectoral-pared": {
+    nombre: "Pectoral en pared",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Pecho, hombro anterior",
+    material: ["pared"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar pecho y parte delantera del hombro.",
+      pasos: [
+        "Apoyá el antebrazo en una pared o marco de puerta, codo a la altura del hombro.",
+        "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el pecho."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-postura-nino": {
+    nombre: "Postura del niño",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Espalda baja",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Relajar y estirar suave la espalda.",
+      pasos: [
+        "De rodillas, sentate sobre los talones.",
+        "Llevá el tronco hacia adelante y estirá los brazos en el piso.",
+        "Frente apoyada y respiración lenta."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-trapecio": {
+    nombre: "Trapecio",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Cuello, espalda alta",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar el cuello y la parte alta de la espalda.",
+      pasos: [
+        "Sentado o de pie, incliná la cabeza hacia un lado, oreja hacia el hombro.",
+        "Podés ayudarte apenas con la mano. Hombro contrario relajado y abajo."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-triceps": {
+    nombre: "Tríceps por encima de la cabeza",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Tríceps",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar el tríceps.",
+      pasos: ["Llevá un brazo arriba y flexioná el codo, con la mano detrás de la cabeza.", "Con la otra mano empujá suave el codo hacia atrás."]
+    },
+    revisar: true
+  },
+  "aperturas-mancuernas": {
+    nombre: "Aperturas con mancuernas",
+    familia: "aperturas",
+    categoria: "fuerza",
+    patron: ["empuje horizontal"],
+    musculos: "Pecho, hombro anterior",
+    material: ["mancuernas", "banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Pecho y hombro anterior.",
+      pasos: [
+        "Acostado en banco plano, mancuernas arriba del pecho con las palmas enfrentadas.",
+        "Codos levemente flexionados: esa flexión no cambia en todo el movimiento.",
+        "Abrí los brazos en arco hacia los costados hasta la línea del hombro.",
+        "Volvé por el mismo arco hasta juntar las mancuernas sobre el pecho."
+      ]
+    },
+    revisar: true
+  },
+  "cruce-poleas-arriba-abajo": {
+    nombre: "Cruce de poleas de arriba hacia abajo",
+    familia: "aperturas",
+    categoria: "fuerza",
+    patron: ["empuje horizontal"],
+    musculos: "Pecho (porción baja), hombro anterior",
+    material: ["polea"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Pecho (sobre todo la parte baja) y hombro anterior.",
+      pasos: [
+        "Poleas en lo alto, un agarre en cada mano. Parate en el medio con un pie adelante y el tronco apenas inclinado.",
+        "Brazos abiertos y codos levemente flexionados.",
+        "Llevá las manos en arco hacia abajo y adelante hasta juntarlas frente a la cadera.",
+        "Volvé lento hasta abrir los brazos, sin que las poleas te tiren hacia atrás."
+      ]
+    },
+    revisar: true
+  },
+  "curl-barra-ez": {
+    nombre: "Curl con barra EZ",
+    familia: "curl-biceps",
+    categoria: "fuerza",
+    patron: ["flexión de codo"],
+    musculos: "Bíceps, braquial",
+    material: ["barra EZ"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Bíceps y braquial (flexores del codo).",
+      pasos: [
+        "De pie, agarrá la barra EZ por la parte curva, palmas hacia arriba, al ancho de hombros.",
+        "Brazos estirados y codos pegados al costado del cuerpo.",
+        "Flexioná los codos llevando la barra hacia los hombros y bajá controlado hasta estirar."
+      ]
+    },
+    revisar: true
+  },
+  "curl-femoral-acostado": {
+    nombre: "Curl femoral acostado (camilla)",
+    familia: "curl-femoral",
+    categoria: "fuerza",
+    patron: ["flexión de rodilla"],
+    musculos: "Isquiosurales",
+    material: ["máquina"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Isquiosurales (parte de atrás del muslo).",
+      pasos: [
+        "Acostado boca abajo en la camilla, con la rodilla alineada con el eje de la máquina.",
+        "El rodillo va apoyado justo por encima de los talones.",
+        "Flexioná las rodillas llevando los talones hacia los glúteos y volvé controlado."
+      ]
+    },
+    revisar: true
+  },
+  "curl-femoral-sentado": {
+    nombre: "Curl femoral sentado",
+    familia: "curl-femoral",
+    categoria: "fuerza",
+    patron: ["flexión de rodilla"],
+    musculos: "Isquiosurales",
+    material: ["máquina"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Isquiosurales (parte de atrás del muslo).",
+      pasos: [
+        "Ajustá la máquina para que la rodilla quede alineada con el eje.",
+        "El rodillo va apoyado justo por encima de los talones.",
+        "Flexioná las rodillas llevando los talones hacia los glúteos y volvé controlado."
+      ]
+    },
+    revisar: true
+  },
+  "curl-martillo": {
+    nombre: "Curl martillo",
+    familia: "curl-biceps",
+    categoria: "fuerza",
+    patron: ["flexión de codo"],
+    musculos: "Braquiorradial, braquial, bíceps",
+    material: ["mancuernas"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Braquiorradial (antebrazo), braquial y bíceps.",
+      pasos: [
+        "De pie, una mancuerna en cada mano, palmas mirándose entre sí (agarre neutro).",
+        "Codos pegados al costado del cuerpo.",
+        "Flexioná el codo subiendo la mancuerna sin girar la muñeca y bajá controlado."
+      ]
+    },
+    revisar: true
+  },
+  "extension-cuadriceps": {
+    nombre: "Extensión de cuádriceps",
+    categoria: "fuerza",
+    patron: ["extensión de rodilla"],
+    musculos: "Cuádriceps",
+    material: ["máquina"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Cuádriceps.",
+      pasos: [
+        "Sentate con la espalda apoyada y la rodilla alineada con el eje de la máquina.",
+        "El rodillo va apoyado sobre la parte baja de la tibia, por encima del tobillo.",
+        "Estirá las rodillas hasta casi extenderlas y volvé bajando lento."
+      ]
+    },
+    revisar: true
+  },
+  "jalon-pecho": {
+    nombre: "Jalón al pecho",
+    familia: "jalon",
+    categoria: "fuerza",
+    patron: ["tracción vertical"],
+    musculos: "Dorsal ancho, espalda media, bíceps",
+    material: ["polea"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Dorsal ancho, espalda media y bíceps.",
+      pasos: [
+        "Sentate en la máquina con los muslos trabados bajo los apoyos.",
+        "Agarrá la barra un poco más ancho que los hombros.",
+        "Tirá la barra hacia la parte alta del pecho llevando los codos hacia abajo y volvé lento hasta estirar los brazos."
+      ]
+    },
+    revisar: true
+  },
+  "pantorrilla-unilateral-banco": {
+    nombre: "Pantorrillas a una pierna en el banco",
+    familia: "pantorrilla",
+    categoria: "fuerza",
+    patron: ["flexión plantar"],
+    musculos: "Gemelos, sóleo",
+    material: ["mancuerna", "banco o escalón"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Gemelos y sóleo (pantorrilla).",
+      pasos: [
+        "Apoyá la parte delantera de un pie en el borde de un banco o escalón; el talón queda en el aire.",
+        "Mancuerna en la mano del lado que trabaja; la otra mano apoyada para el equilibrio.",
+        "Bajá el talón lento por debajo del borde, quedate 1-2 s estirando y subí en punta de pie lo más alto que puedas."
+      ]
+    },
+    revisar: true
+  },
+  paralelas: {
+    nombre: "Paralelas",
+    categoria: "fuerza",
+    patron: ["empuje vertical"],
+    musculos: "Tríceps, pecho, hombro anterior",
+    material: ["paralelas"],
+    precauciones: { etiquetas: ["hombro"], nota: "Bajar hasta 90° de codo, no más. Si no salen limpias, con asistencia." },
+    videos: [],
+    descripcion: {
+      musculos: "Tríceps, pecho y hombro anterior.",
+      pasos: [
+        "Agarrate de las barras paralelas y subí hasta quedar con los brazos estirados.",
+        "Bajá flexionando los codos con el cuerpo levemente inclinado hacia adelante.",
+        "Empujá hasta volver a estirar los brazos."
+      ]
+    },
+    revisar: true
+  },
+  "patada-burro-triceps": {
+    nombre: "Patada de burro",
+    familia: "extension-triceps",
+    categoria: "fuerza",
+    patron: ["extensión de codo"],
+    musculos: "Tríceps",
+    material: ["mancuerna", "banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Tríceps.",
+      pasos: [
+        "Una mano y una rodilla apoyadas en el banco, mancuerna en la otra mano.",
+        "Subí el codo hasta que el brazo quede pegado al costado del cuerpo, paralelo al piso.",
+        "Estirá el codo llevando la mancuerna hacia atrás y volvé hasta 90°, sin mover el brazo."
+      ]
+    },
+    revisar: true
+  },
+  "peso-muerto-rumano-barra": {
+    nombre: "Peso muerto rumano con barra",
+    familia: "peso-muerto-rumano",
+    categoria: "fuerza",
+    patron: ["bisagra"],
+    musculos: "Isquiosurales, glúteos; espalda y zona media",
+    material: ["barra"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Nunca al fallo. Si la espalda se redondea o la bajada se acorta, se corta la serie." },
+    videos: [],
+    descripcion: {
+      musculos: "Isquiosurales y glúteos; espalda y zona media como estabilizadoras.",
+      pasos: [
+        "De pie, barra agarrada con las palmas hacia vos, al ancho de los hombros, apoyada en los muslos.",
+        "Rodillas apenas flexionadas: esa flexión no cambia en todo el movimiento.",
+        "Llevá la cadera hacia atrás y bajá la barra pegada a las piernas, con la espalda recta.",
+        "Cuando no puedas bajar más sin redondear la espalda, volvé empujando la cadera hacia adelante y apretando glúteos."
+      ]
+    },
+    revisar: true
+  },
+  "peso-muerto-trap-bar": {
+    nombre: "Peso muerto con trap bar",
+    familia: "peso-muerto",
+    categoria: "fuerza",
+    patron: ["bisagra", "sentadilla"],
+    musculos: "Glúteos, cuádriceps, isquiosurales, espalda",
+    material: ["trap bar"],
+    precauciones: { etiquetas: ["lumbar"], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Glúteos, cuádriceps, isquiosurales y espalda; zona media como estabilizadora.",
+      pasos: [
+        "Parate en el centro de la barra hexagonal, pies al ancho de cadera.",
+        "Bajá llevando la cadera atrás y flexionando las rodillas, y agarrá las manijas.",
+        "Pecho arriba, espalda neutra y brazos estirados.",
+        "Empujá el piso y subí extendiendo rodillas y cadera a la vez hasta quedar erguido. Bajá controlado por el mismo camino."
+      ]
+    },
+    revisar: true
+  },
+  "press-banca-barra": {
+    nombre: "Press banca plano con barra",
+    familia: "press-banca",
+    categoria: "fuerza",
+    patron: ["empuje horizontal"],
+    musculos: "Pecho, hombro anterior, tríceps",
+    material: ["barra", "banco"],
+    precauciones: { etiquetas: ["hombro"], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Pecho, hombro anterior y tríceps.",
+      pasos: [
+        "Acostate en el banco con los ojos debajo de la barra y los pies apoyados en el piso.",
+        "Agarrá la barra un poco más ancho que los hombros y juntá las escápulas.",
+        "Sacá la barra del rack y llevala sobre los hombros con los brazos estirados.",
+        "Bajala controlada hasta tocar el pecho y empujá hasta volver a estirar los brazos."
+      ]
+    },
+    revisar: true
+  },
+  "press-inclinado-mancuernas": {
+    nombre: "Press inclinado con mancuernas",
+    familia: "press-banca",
+    categoria: "fuerza",
+    patron: ["empuje horizontal"],
+    musculos: "Pecho (porción alta), hombro anterior, tríceps",
+    material: ["mancuernas", "banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Pecho (sobre todo la parte alta), hombro anterior y tríceps.",
+      pasos: [
+        "Banco inclinado, moderado. Sentate con una mancuerna sobre cada muslo.",
+        "Acostate llevando las mancuernas a la altura del pecho, palmas hacia adelante.",
+        "Empujá hacia arriba hasta estirar los brazos y bajá controlado hasta los costados del pecho."
+      ]
+    },
+    revisar: true
+  },
+  "press-mancuerna-media-rodilla": {
+    nombre: "Press con mancuerna en media rodilla",
+    familia: "press-vertical",
+    categoria: "fuerza",
+    patron: ["empuje vertical", "core antirrotación"],
+    musculos: "Hombro, tríceps, zona media",
+    material: ["mancuerna"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Hombro, tríceps y zona media (antirrotación).",
+      pasos: [
+        "Una rodilla apoyada en el piso y el otro pie adelante, apoyado.",
+        "Mancuerna a la altura del hombro del mismo lado que la rodilla apoyada.",
+        "Empujá hacia arriba hasta estirar el brazo y bajá lento. Completá las reps y cambiá de lado."
+      ]
+    },
+    revisar: true
+  },
+  "press-militar-barra": {
+    nombre: "Press militar estricto con barra",
+    familia: "press-vertical",
+    categoria: "fuerza",
+    patron: ["empuje vertical"],
+    musculos: "Deltoides, tríceps, zona media",
+    material: ["barra"],
+    precauciones: { etiquetas: ["hombro", "lumbar"], nota: "La lumbar no se arquea." },
+    videos: [],
+    descripcion: {
+      musculos: "Hombros (deltoides), tríceps y zona media.",
+      pasos: [
+        "De pie, barra en el rack a la altura de la clavícula, agarre un poco más ancho que los hombros.",
+        "Sacá la barra apoyada sobre la parte alta del pecho, codos levemente por delante.",
+        "Empujá la barra hacia arriba en línea recta hasta estirar los brazos y bajá controlado al pecho.",
+        "Estricto: sin ayudarte con las piernas."
+      ]
+    },
+    revisar: true
+  },
+  "remo-barra-codos-pegados": {
+    nombre: "Remo con barra · codos pegados",
+    familia: "remo",
+    categoria: "fuerza",
+    patron: ["tracción horizontal"],
+    musculos: "Dorsal ancho, espalda media, bíceps",
+    material: ["barra"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Bracing todo el tiempo: la espalda no se redondea ni se arquea." },
+    videos: [],
+    descripcion: {
+      musculos: "Dorsal ancho, espalda media y bíceps; zona media y lumbar como estabilizadoras.",
+      pasos: [
+        "De pie, barra agarrada con las palmas hacia abajo, al ancho de los hombros.",
+        "Flexioná un poco las rodillas e inclinate desde la cadera hasta unos 45°, espalda neutra.",
+        "Tirá la barra hacia el abdomen con los codos pegados al cuerpo.",
+        "Bajá controlado hasta estirar los brazos, sin mover el tronco."
+      ]
+    },
+    revisar: true
+  },
+  "remo-polea-baja-barra-ancha": {
+    nombre: "Remo en polea baja · barra ancha, codos abiertos",
+    familia: "remo",
+    categoria: "fuerza",
+    patron: ["tracción horizontal"],
+    musculos: "Romboides, trapecio medio, hombro posterior",
+    material: ["polea"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Espalda media y alta (romboides y trapecio medio) y hombro posterior.",
+      pasos: [
+        "Sentate frente a la polea con los pies apoyados y las rodillas levemente flexionadas.",
+        "Agarrá la barra ancha con las palmas hacia abajo, brazos estirados y espalda erguida.",
+        "Tirá hacia la parte baja del pecho abriendo los codos hacia los costados.",
+        "Volvé lento hasta estirar los brazos, sin inclinar el tronco."
+      ]
+    },
+    revisar: true
+  },
+  "sentadilla-barra": {
+    nombre: "Sentadilla con barra",
+    familia: "sentadilla",
+    categoria: "fuerza",
+    patron: ["sentadilla"],
+    musculos: "Cuádriceps, glúteos, aductores; zona media",
+    material: ["barra", "rack"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Nunca al fallo. Bajar hasta donde la pelvis sigue neutra." },
+    videos: [],
+    descripcion: {
+      musculos: "Cuádriceps, glúteos, aductores; zona media como estabilizadora.",
+      pasos: [
+        "Barra apoyada sobre la parte alta de la espalda (trapecios), manos firmes a los lados.",
+        "Salí del rack con dos pasos cortos y pies al ancho de hombros o algo más, puntas levemente hacia afuera.",
+        "Bajá llevando cadera atrás y abajo a la vez, con el tronco firme.",
+        "Subí empujando el piso hasta quedar de pie."
+      ]
+    },
+    revisar: true
+  },
+  "sentadilla-bulgara-mancuernas": {
+    nombre: "Sentadilla búlgara con mancuernas",
+    familia: "sentadilla-bulgara",
+    categoria: "fuerza",
+    patron: ["zancada"],
+    musculos: "Cuádriceps y glúteos; aductores y zona media",
+    material: ["mancuernas", "banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Cuádriceps y glúteos de la pierna de adelante; aductores y zona media como estabilizadores.",
+      pasos: [
+        "De espaldas a un banco, apoyá el empeine de un pie sobre él.",
+        "Adelantá la otra pierna lo suficiente para que, al bajar, la rodilla quede más o menos sobre el pie.",
+        "Con una mancuerna en cada mano, bajá en vertical hasta que la rodilla de atrás se acerque al piso.",
+        "Subí empujando con el pie de adelante. Completá las reps y cambiá de pierna."
+      ]
+    },
+    revisar: true
+  },
+  "triceps-polea-overhead": {
+    nombre: "Tríceps en polea por encima de la cabeza",
+    familia: "extension-triceps",
+    categoria: "fuerza",
+    patron: ["extensión de codo"],
+    musculos: "Tríceps (porción larga)",
+    material: ["polea", "cuerda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Tríceps, sobre todo la porción larga.",
+      pasos: [
+        "Polea baja o media con cuerda. Agarrá la cuerda y date vuelta, de espaldas a la polea.",
+        "Paso adelante, tronco firme y brazos arriba con los codos flexionados detrás de la cabeza.",
+        "Estirá los codos llevando la cuerda hacia adelante y arriba, y volvé controlado."
+      ]
+    },
+    revisar: true
+  },
+  "caminata-elefante": {
+    nombre: "Caminata del elefante",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Isquiosurales, gemelos, hombros, zona media",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte de atrás de los muslos y los gemelos, y activar hombros y zona media.",
+      pasos: [
+        "De pie, flexioná el tronco y apoyá las manos en el piso, lo más cerca de los pies que puedas. Si no llegás, flexioná un poco las rodillas.",
+        "Subí la cadera bien alta: el cuerpo queda como una \"V\" invertida.",
+        "Sin bajar la cadera, avanzá caminando con manos y pies: mano derecha y pie izquierdo, después mano izquierda y pie derecho. Pasos cortos.",
+        "Mantené las piernas lo más estiradas que puedas: vas a sentir que tira detrás de los muslos y en los gemelos.",
+        "Lento y sin rebotes. Si te tira la zona lumbar, flexioná un poco las rodillas."
+      ]
+    },
+    revisar: true
+  },
+  "gato-vaca": {
+    nombre: "Gato-vaca",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Columna",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar toda la columna, vértebra por vértebra.",
+      pasos: [
+        "En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.",
+        "Exhalá y redondeá la espalda hacia arriba, mentón hacia el pecho.",
+        "Inhalá y hundí la espalda suave, mirada hacia adelante.",
+        "Alterná lento, sin llegar al tope del movimiento."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-90-90-cadera": {
+    nombre: "90/90 de cadera",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera (rotadores)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar la rotación interna y externa de la cadera.",
+      pasos: [
+        "Sentado en el piso, una pierna adelante y la otra al costado, las dos rodillas a 90°.",
+        "Tronco alto; si lo necesitás, apoyá las manos atrás.",
+        "Levantá las rodillas y pasalas hacia el otro lado hasta quedar en 90/90 del lado contrario.",
+        "Lento y controlado."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-articular-general": {
+    nombre: "Movilidad articular general",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Todo el cuerpo",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Lubricar las articulaciones y preparar el cuerpo para moverse.",
+      pasos: [
+        "Empezá por los tobillos: círculos hacia un lado y hacia el otro.",
+        "Seguí subiendo: rodillas, cadera, columna, hombros, codos y muñecas.",
+        "Movimientos suaves y amplios, sin forzar. Cuello solo hacia los lados."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-hombro-banda": {
+    nombre: "Movilidad de hombro con banda",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Hombro",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Preparar el hombro en todas sus direcciones.",
+      pasos: [
+        "Banda atada a un poste a la altura de la cadera, tensión liviana.",
+        "Con el brazo estirado, llevá la banda hacia adelante, hacia atrás, hacia el costado y hacia el cuerpo.",
+        "Movimientos controlados. Repetí con el otro brazo."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-rana": {
+    nombre: "Movilidad de la rana",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera, aductores",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Que se mueva la cadera, no la zona lumbar." },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar la cadera y estirar los aductores (cara interna del muslo).",
+      pasos: [
+        "En cuatro apoyos, abrí las rodillas todo lo que puedas cómodo, pies hacia afuera.",
+        "Manos o antebrazos apoyados en el piso.",
+        "Llevá la cadera hacia atrás, hacia los talones, y volvé hacia adelante.",
+        "Balanceo suave, sin rebotar ni forzar."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-tobillo-cadera-media-rodilla": {
+    nombre: "Movilidad de tobillo y cadera en media rodilla",
+    familia: "movilidad-tobillo",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Tobillo y cadera",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Mejorar la flexión del tobillo (dorsiflexión) y el control de cadera, clave para la sentadilla.",
+      pasos: [
+        "Una rodilla apoyada en el piso y la otra pierna adelante, con todo el pie apoyado.",
+        "Llevá la rodilla de adelante hacia adelante, pasando la punta del pie, sin despegar el talón.",
+        "Desde ahí dibujá círculos chicos con la rodilla: hacia adentro, adelante y afuera."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-tobillo-carga": {
+    nombre: "Movilización de tobillo con carga",
+    familia: "movilidad-tobillo",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Tobillo (dorsiflexión)",
+    material: ["mancuerna o pesa rusa"],
+    precauciones: { etiquetas: ["tobillo"], nota: "Si pincha adelante del tobillo, achicar el recorrido." },
+    videos: [],
+    descripcion: {
+      musculos: "Ganar flexión de tobillo (dorsiflexión) para bajar mejor en la sentadilla y aterrizar bien en los saltos.",
+      pasos: [
+        "Media rodilla, con el pie de adelante bien apoyado y la pesa sobre esa rodilla.",
+        "Llevá la rodilla hacia adelante, en línea con el 2.º-3.er dedo, sin despegar el talón.",
+        "En la posición más adelantada quedate 3 s quieto y volvé."
+      ]
+    },
+    revisar: true
+  },
+  "movilidad-tobillo-media-rodilla": {
+    nombre: "Movilidad de tobillo en media rodilla",
+    familia: "movilidad-tobillo",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Tobillo (dorsiflexión)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Mejorar la flexión del tobillo (dorsiflexión), clave para la búlgara.",
+      pasos: [
+        "Una rodilla apoyada en el piso y la otra pierna adelante, con todo el pie apoyado.",
+        "Llevá la rodilla de adelante hacia adelante, pasando la punta del pie, sin despegar el talón.",
+        "Desde ahí dibujá círculos chicos con la rodilla."
+      ]
+    },
+    revisar: true
+  },
+  "rotaciones-toracicas-cuadrupedia": {
+    nombre: "Rotaciones torácicas en cuadrupedia",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Columna torácica",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar la parte alta de la columna, importante para los presses por encima de la cabeza.",
+      pasos: [
+        "En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.",
+        "Llevá una mano a la nuca.",
+        "Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada. Volvé y repetí."
+      ]
+    },
+    revisar: true
+  },
+  "sentadilla-profunda-disco": {
+    nombre: "Sentadilla profunda con disco y balanceos",
+    familia: "sentadilla",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera y tobillos",
+    material: ["disco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar cadera y tobillos en la posición baja de la sentadilla.",
+      pasos: [
+        "Disco de 10 kg sostenido adelante, a la altura del pecho.",
+        "Bajá a una sentadilla profunda, talones apoyados.",
+        "Balanceá suave el peso de un lado al otro, 8-10 veces.",
+        "Quedate 20 s quieto abajo y subí."
+      ]
+    },
+    revisar: true
+  },
+  "walking-spiderman": {
+    nombre: "Walking Spiderman",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera, flexores de cadera, columna torácica",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar cadera, flexores de cadera y columna torácica mientras avanzás.",
+      pasos: [
+        "Dá una zancada larga y bajá la cadera.",
+        "Apoyá las manos en el piso por dentro del pie de adelante.",
+        "Subí la cadera para estirar la parte de atrás del muslo de adelante.",
+        "Girá el tronco llevando el brazo hacia el techo. Volvé, avanzá con la otra pierna y repetí."
+      ]
+    },
+    revisar: true
+  },
+  "worlds-greatest-stretch": {
+    nombre: "World's Greatest Stretch",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera, flexores de cadera, columna torácica",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar cadera, flexores de cadera y columna torácica en un solo ejercicio.",
+      pasos: [
+        "Dá un paso largo hacia adelante y bajá a una zancada profunda.",
+        "Apoyá las manos en el piso por dentro del pie de adelante, cadera baja.",
+        "Girá el tronco hacia la pierna de adelante llevando el brazo hacia el techo.",
+        "Volvé al centro y cambiá de lado."
+      ]
+    },
+    revisar: true
+  },
+  "pogo-jumps": {
+    nombre: "Pogo jumps",
+    familia: "saltos",
+    categoria: "pliometría",
+    patron: ["salto"],
+    musculos: "Pantorrillas, tobillo (rigidez)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["tobillo", "rodilla"], nota: "Si los tobillos o rodillas se doblan mucho o el talón golpea, saltos más bajos." },
+    videos: [],
+    descripcion: {
+      musculos: "Enseña a tus piernas a rebotar como un resorte. Es el salto más suave, por eso va primero.",
+      pasos: [
+        "Parado, pies al ancho de la cadera, brazos relajados.",
+        "Saltá en el lugar con saltos cortos (5-10 cm) y rápidos, uno atrás del otro.",
+        "Tobillos firmes, en ángulo recto: en el aire, la punta del pie mira apenas hacia arriba. No estires los pies como una bailarina.",
+        "Las rodillas casi no se doblan.",
+        "Tocá el piso con la parte de adelante del pie, sin que el talón golpee, y rebotá enseguida, como si el piso quemara."
+      ],
+      secciones: [
+        {
+          titulo: "Está bien hecho si",
+          texto: "Los saltos son rítmicos y parejos, el contacto con el piso es cortísimo, casi no hacés ruido y no te movés del lugar."
+        },
+        {
+          titulo: "Error común",
+          texto: "Que los tobillos o las rodillas se doblen mucho al caer, o que el talón golpee el piso. Si pasa, hacé saltos más bajos."
+        }
+      ]
+    },
+    revisar: true
+  },
+  "salto-cajon": {
+    nombre: "Salto al cajón",
+    familia: "saltos",
+    categoria: "pliometría",
+    patron: ["salto"],
+    musculos: "Piernas y cadera (potencia)",
+    material: ["cajón"],
+    precauciones: { etiquetas: ["rodilla"], nota: "Bajar siempre caminando. Si cae en sentadilla profunda, el cajón está muy alto." },
+    videos: [],
+    descripcion: {
+      musculos: "Desarrolla potencia: saltar lo más fuerte posible con piernas y cadera. Como caés arriba del cajón, el impacto es mínimo.",
+      pasos: [
+        "Parado frente al cajón, a unos 30 cm, pies al ancho de la cadera.",
+        "Llevá los brazos atrás mientras bajás rápido a un cuarto de sentadilla.",
+        "Sin pausa, saltá hacia arriba lo más fuerte que puedas, llevando los brazos adelante y arriba.",
+        "Caé arriba del cajón con los dos pies a la vez, suave, en la misma posición del snap down.",
+        "Quedate quieto 1-2 segundos, parate y bajá caminando. Nunca saltando hacia abajo."
+      ],
+      secciones: [
+        { titulo: "Altura", texto: "Cajón o plataforma de 30-40 cm. Si solo hay de 50 cm o más, usá un step con elevadores o un banco firme." },
+        { titulo: "Está bien hecho si", texto: "Caés en silencio, en un cuarto o media sentadilla, y te quedás firme sin tambalearte." },
+        { titulo: "Error común", texto: "Caer en sentadilla profunda con las rodillas al pecho. Eso significa que el cajón está muy alto: bajalo." }
+      ]
+    },
+    revisar: true
+  },
+  "salto-horizontal-caida": {
+    nombre: "Salto horizontal con caída estabilizada",
+    familia: "saltos",
+    categoria: "pliometría",
+    patron: ["salto"],
+    musculos: "Piernas y cadera (frenado)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["rodilla"], nota: "Mejor corto y bien frenado que largo y descontrolado." },
+    videos: [],
+    descripcion: {
+      musculos: "Entrena a frenar. Es el mismo trabajo que hacés al correr, al cambiar de dirección o al frenar en el fútbol, y es lo que protege tus rodillas y tu espalda.",
+      pasos: [
+        "Parado, pies al ancho de la cadera.",
+        "Brazos atrás, bajás rápido a un cuarto de sentadilla.",
+        "Saltá hacia adelante lo más lejos que puedas, llevando los brazos adelante.",
+        "Caé con los dos pies a la vez en la posición del snap down y quedate quieto 2 segundos.",
+        "Volvé caminando al punto de partida."
+      ],
+      secciones: [
+        { titulo: "Está bien hecho si", texto: "Te quedás clavado donde caíste, sin dar un paso extra ni tambalearte." },
+        {
+          titulo: "Error común",
+          texto: "Saltar tan lejos que al caer tenés que dar un paso para no caerte. Es mejor un salto más corto y bien frenado que uno largo y descontrolado."
+        }
+      ]
+    },
+    revisar: true
+  },
+  "snap-down": {
+    nombre: "Snap down",
+    familia: "saltos",
+    categoria: "pliometría",
+    patron: ["aterrizaje"],
+    musculos: "Piernas (técnica de aterrizaje)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Aprender a aterrizar sin saltar. Practicás la posición en la que tenés que caer en los saltos, sin impacto, para que después en el cajón te salga sola.",
+      pasos: [
+        "Parado, ponete en puntas de pie con los brazos estirados arriba, bien alto.",
+        "De golpe, bajá los talones, llevá los brazos hacia atrás y caé en un cuarto de sentadilla: cadera atrás, rodillas un poco flexionadas, pecho adelante.",
+        "Quedate quieto 2 segundos en esa posición, como una estatua.",
+        "Volvé a subir tranquilo y repetí."
+      ],
+      secciones: [
+        {
+          titulo: "Cómo tenés que caer",
+          texto: "Con todo el pie apoyado (ni en puntas ni de talón), rodillas alineadas con los pies (que no se vayan hacia adentro), espalda recta y abdomen apretado. En silencio: si suena, bajaste muy duro."
+        },
+        { titulo: "Está bien hecho si", texto: "Caés rápido pero quedás firme, sin tambalearte." }
+      ]
+    },
+    revisar: true
+  }
+};
+
+/* ---------------------------------------------------------
+   RUTINAS: cada ejercicio es una PRESCRIPCIÓN = { id } de la biblioteca
+   + lo de ese día (series, reps, carga, RIR, dosis, nota...).
+   Cualquier campo que pongas acá pisa al de la biblioteca solo en este día
+   (ej: nombre: "Rumano de aproximación").
+   --------------------------------------------------------- */
+const ETAPA6 = {
+  id: "etapa6-fin-de-anio",
+  etapa: "Etapa 6 · Bloque de fin de año",
+  fechas: "Semana 1 · desde el 23 nov 2026",
+  reglas: [
+    "RIR: al terminar cada serie preguntate ¿cuántas repeticiones más me salían con buena técnica? Ese número es el RIR. RIR 3 = te quedaban 3. RIR 0 = no salía ni una más.",
+    "En la sentadilla y el peso muerto rumano nunca se llega al fallo.",
+    "Si aparece dolor lumbar o en una articulación (no cansancio muscular), parás el ejercicio, lo anotás y lo revisamos."
+  ],
+  dias: [
+    {
+      nombre: "Lunes · Tren inferior",
+      bloques: [
+        {
+          nombre: "1 · Calentamiento",
+          ejercicios: [
+            { id: "bici", dosis: "5 min", nota: "De muy suave a moderado." },
+            {
+              id: "movilidad-tobillo-carga",
+              dosis: "10 + 3 s quieto, por lado",
+              nota: "Pesa de 8-12 kg sobre la rodilla. La rodilla avanza en línea con el 2.º-3.er dedo, sin despegar el talón. Si pincha adelante del tobillo, achicá el recorrido."
+            },
+            { id: "worlds-greatest-stretch", dosis: "4 por lado" },
+            {
+              id: "sentadilla-profunda-disco",
+              dosis: "1 serie: 8-10 balanceos + 20 s quieto",
+              nota: "Disco de 10 kg adelante, bajás a sentadilla profunda y balanceás suave de un lado al otro."
+            },
+            { id: "buenos-dias-palo", dosis: "2×10", nota: "Lento. Cadera atrás y espalda recta hasta sentir tirar los isquios." },
+            {
+              id: "caminata-lateral-banda",
+              dosis: "2×10 pasos por lado",
+              nota: "Banda arriba de las rodillas, en media sentadilla, sin que las rodillas se junten."
+            },
+            { id: "plancha-frontal-lateral", dosis: "30 s + 30 s por lado · 1-2 series", nota: "Seguidas, abdomen y glúteos apretados." },
+            { id: "elevaciones-talon", dosis: "1×15" },
+            { id: "snap-down", nuevo: true, dosis: "2×5" }
+          ]
+        },
+        {
+          nombre: "2 · Pliometría",
+          reglas: [
+            "Se salta descansado: entre series descansás completo, aunque te sientas bien.",
+            "Importa la calidad, no la cantidad. Si un salto sale mal (ruido, rodillas hacia adentro, te tambaleás), cortás la serie ahí.",
+            "Aterrizás como en el snap down: todo el pie, cadera atrás, rodillas alineadas y en silencio."
+          ],
+          ejercicios: [
+            { id: "pogo-jumps", dosis: "2×10 · descanso 45 s" },
+            { id: "salto-cajon", dosis: "4×4 · cajón de 30-40 cm · descanso 60-90 s", anotar: [{ etiqueta: "Altura del cajón que usaste", placeholder: "cm" }] },
+            { id: "salto-horizontal-caida", dosis: "3×3 · descanso 60-90 s" }
+          ],
+          cierre: {
+            titulo: "🎥 Grabate",
+            texto: "Filmá una serie de snap down y una de cada salto, de frente y de costado: celular apoyado a la altura de la cadera, a 2-3 m, con el cuerpo entero en la imagen. Si tu celular tiene cámara lenta, usala. Mandáselo a Enzo."
+          }
+        },
+        {
+          nombre: "3 · Bloque principal",
+          principal: true,
+          ejercicios: [
+            {
+              id: "sentadilla-barra",
+              destacado: true,
+              series: "4",
+              reps: "6",
+              carga: "90 kg",
+              rir: "3",
+              descanso: "2:30-3'",
+              previo: "Aproximaciones (no tienen que cansar): barra × 8, 45 kg × 5, 60 kg × 3, 75 kg × 1.",
+              indicaciones: [
+                "Bracing antes de bajar: tomás aire, apretás el abdomen como si te fueran a dar un golpe y lo mantenés toda la repetición.",
+                "Bajás controlado hasta donde la pelvis sigue neutra. Subís lo más rápido que puedas sin perder la posición."
+              ]
+            },
+            {
+              id: "sentadilla-bulgara-mancuernas",
+              series: "4",
+              reps: "8 por pierna",
+              carga: "10 kg c/u",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: ["Pie de atrás sobre el banco, empujás con la pierna de adelante.", "Rodilla alineada con el pie y pelvis sin girar."]
+            },
+            {
+              id: "peso-muerto-rumano-barra",
+              series: "3",
+              reps: "8",
+              carga: "60 kg",
+              rir: "2-3",
+              descanso: "2 min",
+              indicaciones: [
+                "Rodillas apenas flexionadas, la cadera va hacia atrás y la barra baja pegada a las piernas.",
+                "Bajás solo hasta donde la espalda se mantiene recta (más o menos mitad de la tibia) y subís apretando glúteos.",
+                "Si la espalda se redondea, cortás la serie."
+              ]
+            },
+            {
+              id: "extension-cuadriceps",
+              grupo: "A1",
+              series: "3",
+              reps: "12-15",
+              carga: "40 kg",
+              rir: "1-2 · última al fallo",
+              descanso: "—",
+              previo: "Superserie: hacés extensión e inmediatamente curl, y recién ahí descansás.",
+              indicaciones: [
+                "Recorrido completo y la bajada lenta.",
+                "Última vuelta al fallo: antes de empezarla, adiviná cuántas te van a salir. Anotá lo que adivinaste y lo que salió. Así aprendemos a medir el RIR."
+              ],
+              anotar: [
+                { etiqueta: "Serie al fallo · ¿cuántas adivinaste?", placeholder: "reps" },
+                { etiqueta: "Serie al fallo · ¿cuántas salieron?", placeholder: "reps" }
+              ]
+            },
+            {
+              id: "curl-femoral-acostado",
+              grupo: "A2",
+              series: "3",
+              reps: "12-15",
+              carga: "35 kg",
+              rir: "1-2",
+              descanso: "60-75 s al terminar el par",
+              indicaciones: [
+                "Va justo después de la extensión, sin pausa.",
+                "Recorrido completo y la bajada lenta."
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "4 · Estiramiento",
+          nota: "30 s cada uno · tiene que tirar, no doler · sin rebotes y respirando lento.",
+          ejercicios: [
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna", nota: "Lo sentís adelante del muslo." },
+            { id: "estiramiento-flexor-cadera", dosis: "30 s por pierna", nota: "Lo sentís adelante de la cadera." },
+            { id: "estiramiento-isquios-acostado-banda", dosis: "30 s por pierna", nota: "Lo sentís atrás del muslo." },
+            { id: "estiramiento-figure-four", dosis: "30 s por lado", nota: "Lo sentís en el glúteo." },
+            { id: "estiramiento-mariposa", dosis: "30 s", nota: "Lo sentís en los aductores (cara interna del muslo)." },
+            { id: "estiramiento-gemelo-pared", dosis: "30 s por pierna", nota: "Rodilla estirada y después flexionada. Lo sentís en la pantorrilla." }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+const ADAPTACION = {
+  id: "etapa5-adaptacion",
+  etapa: "Etapa 5 · Semana de adaptación",
   fechas: "16-20 nov 2026",
-  // Reglas generales de la semana. Un día puede traer las suyas (ver Día 3).
   reglas: [
     "Nada al fallo. Si dudás, elegí la carga más baja del rango.",
     "Bajada siempre controlada en todos los ejercicios.",
@@ -134,22 +1678,26 @@ const RUTINA = {
         {
           nombre: "Entrada en calor y movilidad · 15 min",
           ejercicios: [
-            { nombre: "Bici", descripcion: { musculos: "Subir la temperatura corporal y preparar las piernas.", pasos: ["Ajustá el sillín: con el pedal abajo, la rodilla queda apenas flexionada.", "Pedaleá a ritmo cómodo y subí la intensidad de a poco."] }, dosis: "5 min", nota: "Ritmo cómodo y progresivo." },
-            { nombre: "Movilidad articular general", descripcion: { musculos: "Lubricar las articulaciones y preparar el cuerpo para moverse.", pasos: ["Empezá por los tobillos: círculos hacia un lado y hacia el otro.", "Seguí subiendo: rodillas, cadera, columna, hombros, codos y muñecas.", "Movimientos suaves y amplios, sin forzar. Cuello solo hacia los lados."] }, dosis: "2-3 min", nota: "Tobillos, rodillas, caderas, columna y hombros." },
-            { nombre: "Movilidad de tobillo y cadera en media rodilla", descripcion: { musculos: "Mejorar la flexión del tobillo (dorsiflexión) y el control de cadera, clave para la sentadilla.", pasos: ["Una rodilla apoyada en el piso y la otra pierna adelante, con todo el pie apoyado.", "Llevá la rodilla de adelante hacia adelante, pasando la punta del pie, sin despegar el talón.", "Desde ahí dibujá círculos chicos con la rodilla: hacia adentro, adelante y afuera."] }, dosis: "6 círculos por lado", nota: "Talón de adelante pegado al piso." },
-            { nombre: "World's Greatest Stretch", descripcion: { musculos: "Movilizar cadera, flexores de cadera y columna torácica en un solo ejercicio.", pasos: ["Dá un paso largo hacia adelante y bajá a una zancada profunda.", "Apoyá las manos en el piso por dentro del pie de adelante, cadera baja.", "Girá el tronco hacia la pierna de adelante llevando el brazo hacia el techo.", "Volvé al centro y cambiá de lado."] }, dosis: "5 por lado", nota: "Manos por dentro del pie y rotá el tronco hacia la pierna de adelante." },
-            { nombre: "Plancha frontal + lateral", descripcion: { musculos: "Activar la zona media antes de cargar peso.", pasos: ["Frontal: antebrazos y puntas de los pies apoyados, cuerpo en línea recta de cabeza a talones.", "Sin descansar, girá hacia un costado: un antebrazo apoyado, pies uno sobre otro, cadera arriba.", "Pasá al otro lado. Abdomen firme y sin dejar caer la cadera."] }, dosis: "2 series · 30 s + 30 s por lado", nota: "Seguidas, sin descanso entre posiciones." },
-            { nombre: "Puente de glúteos", descripcion: { musculos: "Activar glúteos y preparar la extensión de cadera.", pasos: ["Acostado boca arriba, rodillas flexionadas y plantas apoyadas.", "Subí la pelvis apretando los glúteos hasta formar una línea de rodillas a hombros.", "Bajá lento sin arquear la zona lumbar."] }, dosis: "2 × 12", nota: "Sin arquear la zona lumbar. Bajá lento." }
+            { id: "bici", dosis: "5 min", nota: "Ritmo cómodo y progresivo." },
+            { id: "movilidad-articular-general", dosis: "2-3 min", nota: "Tobillos, rodillas, caderas, columna y hombros." },
+            { id: "movilidad-tobillo-cadera-media-rodilla", dosis: "6 círculos por lado", nota: "Talón de adelante pegado al piso." },
+            { id: "worlds-greatest-stretch", dosis: "5 por lado", nota: "Manos por dentro del pie y rotá el tronco hacia la pierna de adelante." },
+            { id: "plancha-frontal-lateral", dosis: "2 series · 30 s + 30 s por lado", nota: "Seguidas, sin descanso entre posiciones." },
+            { id: "puente-gluteos", dosis: "2 × 12", nota: "Sin arquear la zona lumbar. Bajá lento." }
           ]
         },
         {
           nombre: "Trabajo principal · 40 min",
-          principal: true,   // estos ejercicios llevan series, carga, RIR y descanso
+          principal: true,
           ejercicios: [
             {
-              nombre: "Sentadilla",
-              descripcion: { musculos: "Cuádriceps, glúteos, aductores; zona media como estabilizadora.", pasos: ["Barra apoyada sobre la parte alta de la espalda (trapecios), manos firmes a los lados.", "Salí del rack con dos pasos cortos y pies al ancho de hombros o algo más, puntas levemente hacia afuera.", "Bajá llevando cadera atrás y abajo a la vez, con el tronco firme.", "Subí empujando el piso hasta quedar de pie."] }, destacado: true,
-              series: "6", reps: "4", carga: "70-75 kg", rir: "4-5", descanso: "2 min",
+              id: "sentadilla-barra",
+              destacado: true,
+              series: "6",
+              reps: "4",
+              carga: "70-75 kg",
+              rir: "4-5",
+              descanso: "2 min",
               previo: "Antes: barra sola × 8 y 50 kg × 5.",
               indicaciones: [
                 "Tomá aire y apretá el abdomen antes de bajar (bracing).",
@@ -159,27 +1707,39 @@ const RUTINA = {
               ]
             },
             {
-              nombre: "Extensión de rodilla en máquina",
-              descripcion: { musculos: "Cuádriceps.", pasos: ["Sentate con la espalda apoyada y la rodilla alineada con el eje de la máquina.", "El rodillo va apoyado sobre la parte baja de la tibia, por encima del tobillo.", "Estirá las rodillas hasta casi extenderlas y volvé bajando lento."] },
-              series: "4", reps: "12", carga: "35-40 kg", rir: "3", descanso: "75 s",
+              id: "extension-cuadriceps",
+              series: "4",
+              reps: "12",
+              carga: "35-40 kg",
+              rir: "3",
+              descanso: "75 s",
               indicaciones: ["Recorrido completo y pausa de 1 segundo arriba.", "Bajada lenta, sin impulso y con la cadera apoyada."]
             },
             {
-              nombre: "Curl femoral en máquina",
-              descripcion: { musculos: "Isquiosurales (parte de atrás del muslo).", pasos: ["Ajustá la máquina para que la rodilla quede alineada con el eje.", "El rodillo va apoyado justo por encima de los talones.", "Flexioná las rodillas llevando los talones hacia los glúteos y volvé controlado."] },
-              series: "4", reps: "15", carga: "30-35 kg", rir: "3", descanso: "60-75 s",
+              id: "curl-femoral-acostado",
+              series: "4",
+              reps: "15",
+              carga: "30-35 kg",
+              rir: "3",
+              descanso: "60-75 s",
               indicaciones: ["Cadera bien apoyada en la máquina.", "Pausa de 1 segundo al flexionar y vuelta lenta."]
             },
             {
-              nombre: "Press inclinado con mancuernas",
-              descripcion: { musculos: "Pecho (sobre todo la parte alta), hombro anterior y tríceps.", pasos: ["Banco inclinado, moderado. Sentate con una mancuerna sobre cada muslo.", "Acostate llevando las mancuernas a la altura del pecho, palmas hacia adelante.", "Empujá hacia arriba hasta estirar los brazos y bajá controlado hasta los costados del pecho."] },
-              series: "4", reps: "10", carga: "17,5-20 kg c/u", rir: "3", descanso: "90 s",
+              id: "press-inclinado-mancuernas",
+              series: "4",
+              reps: "10",
+              carga: "17,5-20 kg c/u",
+              rir: "3",
+              descanso: "90 s",
               indicaciones: ["Espalda apoyada y escápulas firmes contra el banco.", "Bajá controlado y empujá sin chocar las mancuernas arriba."]
             },
             {
-              nombre: "Jalón al pecho",
-              descripcion: { musculos: "Dorsal ancho, espalda media y bíceps.", pasos: ["Sentate en la máquina con los muslos trabados bajo los apoyos.", "Agarrá la barra un poco más ancho que los hombros.", "Tirá la barra hacia la parte alta del pecho llevando los codos hacia abajo y volvé lento hasta estirar los brazos."] },
-              series: "4", reps: "10", carga: "40-45 kg", rir: "3", descanso: "90 s",
+              id: "jalon-pecho",
+              series: "4",
+              reps: "10",
+              carga: "40-45 kg",
+              rir: "3",
+              descanso: "90 s",
               indicaciones: ["Hombros lejos de las orejas. Llevá los codos hacia abajo.", "Barra a la parte alta del pecho, sin balancear el tronco. Vuelta lenta."]
             }
           ]
@@ -187,12 +1747,12 @@ const RUTINA = {
         {
           nombre: "Estiramientos · 8 min",
           ejercicios: [
-            { nombre: "Cuádriceps en pared", descripcion: { musculos: "Estirar la parte de adelante del muslo.", pasos: ["Arrodillate de espaldas a una pared y apoyá el empeine de una pierna en ella.", "Adelantá la otra pierna con el pie apoyado.", "Subí el tronco de a poco sin arquear la lumbar, hasta sentir tensión en el muslo."] }, dosis: "30 s por pierna" },
-            { nombre: "Isquiosurales con banda", descripcion: { musculos: "Estirar la parte de atrás del muslo.", pasos: ["Acostado boca arriba, pasá la banda por la planta de un pie.", "Subí esa pierna estirada tirando suave de la banda.", "La otra pierna queda apoyada en el piso."] }, dosis: "30 s por pierna" },
-            { nombre: "Figure Four (glúteos)", descripcion: { musculos: "Estirar glúteos y cadera.", pasos: ["Acostado boca arriba, apoyá un tobillo sobre la rodilla contraria (forma de 4).", "Agarrá el muslo de la pierna de abajo y acercalo al pecho."] }, dosis: "30 s por lado" },
-            { nombre: "Butterfly (aductores)", descripcion: { musculos: "Estirar la cara interna del muslo.", pasos: ["Sentado, juntá las plantas de los pies y dejá caer las rodillas hacia los costados.", "Espalda larga. Podés empujar suave las rodillas hacia abajo con los codos."] }, dosis: "30 s" },
-            { nombre: "Pectoral en pared", descripcion: { musculos: "Estirar pecho y parte delantera del hombro.", pasos: ["Apoyá el antebrazo en una pared o marco de puerta, codo a la altura del hombro.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el pecho."] }, dosis: "30 s por lado" },
-            { nombre: "Dorsal sobre banco", descripcion: { musculos: "Estirar la espalda (dorsales).", pasos: ["De rodillas frente a un banco, apoyá los codos o las manos en él.", "Llevá la cadera hacia atrás y dejá bajar el pecho hacia el piso."] }, dosis: "30-45 s" }
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna" },
+            { id: "estiramiento-isquios-acostado-banda", dosis: "30 s por pierna" },
+            { id: "estiramiento-figure-four", dosis: "30 s por lado" },
+            { id: "estiramiento-mariposa", dosis: "30 s" },
+            { id: "estiramiento-pectoral-pared", dosis: "30 s por lado" },
+            { id: "estiramiento-dorsal-banco", dosis: "30-45 s" }
           ]
         }
       ]
@@ -206,12 +1766,12 @@ const RUTINA = {
         {
           nombre: "Calentamiento",
           ejercicios: [
-            { nombre: "Movilidad articular general", descripcion: { musculos: "Lubricar las articulaciones y preparar el cuerpo para moverse.", pasos: ["Empezá por los tobillos: círculos hacia un lado y hacia el otro.", "Seguí subiendo: rodillas, cadera, columna, hombros, codos y muñecas.", "Movimientos suaves y amplios, sin forzar. Cuello solo hacia los lados."] }, dosis: "2-3 min", nota: "Más tiempo en cadera, columna, hombros, codos y muñecas." },
-            { nombre: "Remo suave", descripcion: { musculos: "Entrar en calor con todo el cuerpo.", pasos: ["Pies atados en los apoyos, agarrá el manillar.", "Ida: piernas → tronco → brazos. Vuelta: brazos → tronco → piernas.", "Ritmo cómodo: tenés que poder hablar sin problema."] }, dosis: "5 min", nota: "Tenés que poder hablar sin problema." },
-            { nombre: "Rotaciones torácicas en cuadrupedia", descripcion: { musculos: "Movilizar la parte alta de la columna, importante para los presses por encima de la cabeza.", pasos: ["En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.", "Llevá una mano a la nuca.", "Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada. Volvé y repetí."] }, dosis: "6 por lado", nota: "Mano en la nuca, abrí el codo hacia el techo." },
-            { nombre: "Movilidad de hombro con banda", descripcion: { musculos: "Preparar el hombro en todas sus direcciones.", pasos: ["Banda atada a un poste a la altura de la cadera, tensión liviana.", "Con el brazo estirado, llevá la banda hacia adelante, hacia atrás, hacia el costado y hacia el cuerpo.", "Movimientos controlados. Repetí con el otro brazo."] }, dosis: "8 por movimiento y brazo" },
-            { nombre: "Plancha frontal + lateral", descripcion: { musculos: "Activar la zona media antes de cargar peso.", pasos: ["Frontal: antebrazos y puntas de los pies apoyados, cuerpo en línea recta de cabeza a talones.", "Sin descansar, girá hacia un costado: un antebrazo apoyado, pies uno sobre otro, cadera arriba.", "Pasá al otro lado. Abdomen firme y sin dejar caer la cadera."] }, dosis: "2 series · 30 s cada posición" },
-            { nombre: "Banda en press militar", descripcion: { musculos: "Activar la estabilidad del hombro y del tronco antes del press.", pasos: ["Banda atada a un poste a la altura de los hombros, de frente al poste.", "Hacé el movimiento de press militar: la banda tira los brazos hacia adelante.", "Mantené los brazos verticales; el cuerpo no se mueve."] }, dosis: "2 × 10", nota: "La banda tira hacia adelante; vos mantenés los brazos verticales." }
+            { id: "movilidad-articular-general", dosis: "2-3 min", nota: "Más tiempo en cadera, columna, hombros, codos y muñecas." },
+            { id: "remo-ergometro", dosis: "5 min", nota: "Tenés que poder hablar sin problema." },
+            { id: "rotaciones-toracicas-cuadrupedia", dosis: "6 por lado", nota: "Mano en la nuca, abrí el codo hacia el techo." },
+            { id: "movilidad-hombro-banda", dosis: "8 por movimiento y brazo" },
+            { id: "plancha-frontal-lateral", dosis: "2 series · 30 s cada posición" },
+            { id: "activacion-press-militar-banda", dosis: "2 × 10", nota: "La banda tira hacia adelante; vos mantenés los brazos verticales." }
           ]
         },
         {
@@ -219,9 +1779,13 @@ const RUTINA = {
           principal: true,
           ejercicios: [
             {
-              nombre: "Press militar estricto con barra",
-              descripcion: { musculos: "Hombros (deltoides), tríceps y zona media.", pasos: ["De pie, barra en el rack a la altura de la clavícula, agarre un poco más ancho que los hombros.", "Sacá la barra apoyada sobre la parte alta del pecho, codos levemente por delante.", "Empujá la barra hacia arriba en línea recta hasta estirar los brazos y bajá controlado al pecho.", "Estricto: sin ayudarte con las piernas."] }, destacado: true,
-              series: "4", reps: "8", carga: "32,5 kg", rir: "Mucho margen", descanso: "2 min",
+              id: "press-militar-barra",
+              destacado: true,
+              series: "4",
+              reps: "8",
+              carga: "32,5 kg",
+              rir: "Mucho margen",
+              descanso: "2 min",
               previo: "El peso es de referencia: ajustalo para que sobren varias reps limpias.",
               indicaciones: [
                 "Bracing en cada repetición: aire a la panza, apretá, costillas abajo y glúteos firmes.",
@@ -230,27 +1794,39 @@ const RUTINA = {
               ]
             },
             {
-              nombre: "Press con mancuerna en media rodilla",
-              descripcion: { musculos: "Hombro, tríceps y zona media (antirrotación).", pasos: ["Una rodilla apoyada en el piso y el otro pie adelante, apoyado.", "Mancuerna a la altura del hombro del mismo lado que la rodilla apoyada.", "Empujá hacia arriba hasta estirar el brazo y bajá lento. Completá las reps y cambiá de lado."] },
-              series: "3", reps: "12 por brazo", carga: "12,5-15 kg", rir: "3-4", descanso: "60 s",
+              id: "press-mancuerna-media-rodilla",
+              series: "3",
+              reps: "12 por brazo",
+              carga: "12,5-15 kg",
+              rir: "3-4",
+              descanso: "60 s",
               indicaciones: ["Una rodilla apoyada y el otro pie adelante.", "Empujá vertical sin inclinar el tronco. Bajada en 2-3 s."]
             },
             {
-              nombre: "Paralelas",
-              descripcion: { musculos: "Tríceps, pecho y hombro anterior.", pasos: ["Agarrate de las barras paralelas y subí hasta quedar con los brazos estirados.", "Bajá flexionando los codos con el cuerpo levemente inclinado hacia adelante.", "Empujá hasta volver a estirar los brazos."] },
-              series: "4", reps: "6-8", carga: "Peso corporal", rir: "3", descanso: "90 s",
+              id: "paralelas",
+              series: "4",
+              reps: "6-8",
+              carga: "Peso corporal",
+              rir: "3",
+              descanso: "90 s",
               indicaciones: ["Bajá hasta que el codo quede en 90°, no más.", "Hombros lejos de las orejas. Si no salen 6 limpias, usá asistencia."]
             },
             {
-              nombre: "Tríceps en polea por encima de la cabeza",
-              descripcion: { musculos: "Tríceps, sobre todo la porción larga.", pasos: ["Polea baja o media con cuerda. Agarrá la cuerda y date vuelta, de espaldas a la polea.", "Paso adelante, tronco firme y brazos arriba con los codos flexionados detrás de la cabeza.", "Estirá los codos llevando la cuerda hacia adelante y arriba, y volvé controlado."] },
-              series: "3", reps: "15", carga: "Según RIR", rir: "3 en la 1.ª", descanso: "60 s",
+              id: "triceps-polea-overhead",
+              series: "3",
+              reps: "15",
+              carga: "Según RIR",
+              rir: "3 en la 1.ª",
+              descanso: "60 s",
               indicaciones: ["Con cuerda, de espaldas a la polea. Codos fijos hacia adelante.", "Mismo peso en las 3 series."]
             },
             {
-              nombre: "Patada de burro",
-              descripcion: { musculos: "Tríceps.", pasos: ["Una mano y una rodilla apoyadas en el banco, mancuerna en la otra mano.", "Subí el codo hasta que el brazo quede pegado al costado del cuerpo, paralelo al piso.", "Estirá el codo llevando la mancuerna hacia atrás y volvé hasta 90°, sin mover el brazo."] },
-              series: "3", reps: "20 por brazo", carga: "Liviana", rir: "3 en la 1.ª", descanso: "45-60 s",
+              id: "patada-burro-triceps",
+              series: "3",
+              reps: "20 por brazo",
+              carga: "Liviana",
+              rir: "3 en la 1.ª",
+              descanso: "45-60 s",
               indicaciones: ["Codo pegado al cuerpo y quieto; estirá el brazo completo.", "El ardor no es el fallo: seguí mientras la técnica esté limpia."]
             }
           ]
@@ -258,19 +1834,17 @@ const RUTINA = {
         {
           nombre: "Estiramientos",
           ejercicios: [
-            { nombre: "Tríceps por encima de la cabeza", descripcion: { musculos: "Estirar el tríceps.", pasos: ["Llevá un brazo arriba y flexioná el codo, con la mano detrás de la cabeza.", "Con la otra mano empujá suave el codo hacia atrás."] }, dosis: "30 s por brazo" },
-            { nombre: "Brazo cruzado delante del pecho", descripcion: { musculos: "Estirar la parte de atrás del hombro.", pasos: ["Cruzá un brazo estirado por delante del pecho.", "Con el otro brazo acercalo hacia el cuerpo, sin subir el hombro."] }, dosis: "30 s por brazo" },
-            { nombre: "Pectoral en pared", descripcion: { musculos: "Estirar pecho y parte delantera del hombro.", pasos: ["Apoyá el antebrazo en una pared o marco de puerta, codo a la altura del hombro.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el pecho."] }, dosis: "30 s por lado" },
-            { nombre: "Trapecio", descripcion: { musculos: "Estirar el cuello y la parte alta de la espalda.", pasos: ["Sentado o de pie, incliná la cabeza hacia un lado, oreja hacia el hombro.", "Podés ayudarte apenas con la mano. Hombro contrario relajado y abajo."] }, dosis: "20-30 s por lado" },
-            { nombre: "Apertura torácica sobre banco", descripcion: { musculos: "Abrir la parte alta de la espalda y el pecho.", pasos: ["De rodillas frente a un banco, apoyá los codos en él con las manos juntas.", "Llevá la cadera hacia atrás y dejá bajar el pecho, sintiendo la apertura en la espalda alta."] }, dosis: "30-45 s" }
+            { id: "estiramiento-triceps", dosis: "30 s por brazo" },
+            { id: "estiramiento-brazo-cruzado", dosis: "30 s por brazo" },
+            { id: "estiramiento-pectoral-pared", dosis: "30 s por lado" },
+            { id: "estiramiento-trapecio", dosis: "20-30 s por lado" },
+            { id: "estiramiento-apertura-toracica-banco", dosis: "30-45 s" }
           ]
         }
       ]
     },
     {
       nombre: "Día 3 · Piernas y bíceps",
-      // Este día no trae objetivo, duración ni intensidad en el PDF: la app simplemente no los muestra.
-      // Reglas propias: reemplazan a las generales de la semana solo en este día.
       reglas: [
         "Nada al fallo, salvo el final de la superserie de bíceps.",
         "Bajada siempre controlada.",
@@ -281,14 +1855,39 @@ const RUTINA = {
           nombre: "Calentamiento",
           nota: "Hacelo en este orden, de arriba hacia abajo.",
           ejercicios: [
-            { nombre: "Movilidad articular general", descripcion: { musculos: "Lubricar las articulaciones y preparar el cuerpo para moverse.", pasos: ["Empezá por los tobillos: círculos hacia un lado y hacia el otro.", "Seguí subiendo: rodillas, cadera, columna, hombros, codos y muñecas.", "Movimientos suaves y amplios, sin forzar. Cuello solo hacia los lados."] }, dosis: "2-3 min", nota: "De abajo hacia arriba, suave." },
-            { nombre: "Caminata", descripcion: { musculos: "Subir la temperatura corporal antes de mover peso.", pasos: ["En cinta o en el lugar, a paso firme.", "Empezá suave y aumentá el ritmo de a poco."] }, dosis: "5 min", nota: "Ritmo cómodo para entrar en temperatura." },
-            { nombre: "90/90 de cadera", descripcion: { musculos: "Movilizar la rotación interna y externa de la cadera.", pasos: ["Sentado en el piso, una pierna adelante y la otra al costado, las dos rodillas a 90°.", "Tronco alto; si lo necesitás, apoyá las manos atrás.", "Levantá las rodillas y pasalas hacia el otro lado hasta quedar en 90/90 del lado contrario.", "Lento y controlado."] }, dosis: "10 movimientos", nota: "Sentado, rodillas a 90°. Pasá las rodillas de un lado al otro, controlado." },
-            { nombre: "Walking Spiderman", descripcion: { musculos: "Movilizar cadera, flexores de cadera y columna torácica mientras avanzás.", pasos: ["Dá una zancada larga y bajá la cadera.", "Apoyá las manos en el piso por dentro del pie de adelante.", "Subí la cadera para estirar la parte de atrás del muslo de adelante.", "Girá el tronco llevando el brazo hacia el techo. Volvé, avanzá con la otra pierna y repetí."] }, dosis: "6 pasos", nota: "Zancada larga, manos adentro del pie, subí la cadera y girá el tronco llevando el brazo al techo." },
-            { nombre: "Movilidad de tobillo en media rodilla", descripcion: { musculos: "Mejorar la flexión del tobillo (dorsiflexión), clave para la búlgara.", pasos: ["Una rodilla apoyada en el piso y la otra pierna adelante, con todo el pie apoyado.", "Llevá la rodilla de adelante hacia adelante, pasando la punta del pie, sin despegar el talón.", "Desde ahí dibujá círculos chicos con la rodilla."] }, dosis: "6 círculos por lado", nota: "Talón de adelante pegado al piso. Rodilla hacia adelante y círculos chicos." },
-            { nombre: "Frog Mobility", descripcion: { musculos: "Movilizar la cadera y estirar los aductores (cara interna del muslo).", pasos: ["En cuatro apoyos, abrí las rodillas todo lo que puedas cómodo, pies hacia afuera.", "Manos o antebrazos apoyados en el piso.", "Llevá la cadera hacia atrás, hacia los talones, y volvé hacia adelante.", "Balanceo suave, sin rebotar ni forzar."] }, dosis: "10 balanceos", nota: "Rodillas bien abiertas, manos o antebrazos apoyados. Llevá la cadera atrás y adelante sin forzar." },
-            { nombre: "Plancha frontal + lateral", descripcion: { musculos: "Activar la zona media antes de cargar peso.", pasos: ["Frontal: antebrazos y puntas de los pies apoyados, cuerpo en línea recta de cabeza a talones.", "Sin descansar, girá hacia un costado: un antebrazo apoyado, pies uno sobre otro, cadera arriba.", "Pasá al otro lado. Abdomen firme y sin dejar caer la cadera."] }, dosis: "2 series · 30 s cada posición", nota: "Seguidas: frontal, lateral derecha y lateral izquierda. Abdomen firme." },
-            { nombre: "Puente de glúteos sostenido", descripcion: { musculos: "Activar los glúteos antes del peso muerto.", pasos: ["Acostado boca arriba, rodillas flexionadas y plantas apoyadas.", "Subí la pelvis apretando los glúteos hasta formar una línea de rodillas a hombros.", "Quedate arriba sin arquear la zona lumbar y bajá lento."] }, dosis: "2 series · 30 s", nota: "Arriba apretando glúteos, sin arquear la lumbar. Descansá 10 s." }
+            { id: "movilidad-articular-general", dosis: "2-3 min", nota: "De abajo hacia arriba, suave." },
+            { id: "caminata", dosis: "5 min", nota: "Ritmo cómodo para entrar en temperatura." },
+            {
+              id: "movilidad-90-90-cadera",
+              dosis: "10 movimientos",
+              nota: "Sentado, rodillas a 90°. Pasá las rodillas de un lado al otro, controlado."
+            },
+            {
+              id: "walking-spiderman",
+              dosis: "6 pasos",
+              nota: "Zancada larga, manos adentro del pie, subí la cadera y girá el tronco llevando el brazo al techo."
+            },
+            {
+              id: "movilidad-tobillo-media-rodilla",
+              dosis: "6 círculos por lado",
+              nota: "Talón de adelante pegado al piso. Rodilla hacia adelante y círculos chicos."
+            },
+            {
+              id: "movilidad-rana",
+              dosis: "10 balanceos",
+              nota: "Rodillas bien abiertas, manos o antebrazos apoyados. Llevá la cadera atrás y adelante sin forzar."
+            },
+            {
+              id: "plancha-frontal-lateral",
+              dosis: "2 series · 30 s cada posición",
+              nota: "Seguidas: frontal, lateral derecha y lateral izquierda. Abdomen firme."
+            },
+            {
+              id: "puente-gluteos",
+              nombre: "Puente de glúteos sostenido",
+              dosis: "2 series · 30 s",
+              nota: "Arriba apretando glúteos, sin arquear la lumbar. Descansá 10 s."
+            }
           ]
         },
         {
@@ -296,9 +1895,13 @@ const RUTINA = {
           principal: true,
           ejercicios: [
             {
-              nombre: "Trap bar deadlift",
-              descripcion: { musculos: "Glúteos, cuádriceps, isquiosurales y espalda; zona media como estabilizadora.", pasos: ["Parate en el centro de la barra hexagonal, pies al ancho de cadera.", "Bajá llevando la cadera atrás y flexionando las rodillas, y agarrá las manijas.", "Pecho arriba, espalda neutra y brazos estirados.", "Empujá el piso y subí extendiendo rodillas y cadera a la vez hasta quedar erguido. Bajá controlado por el mismo camino."] }, destacado: true,
-              series: "4", reps: "6", carga: "100 kg", rir: "Con margen", descanso: "2 min",
+              id: "peso-muerto-trap-bar",
+              destacado: true,
+              series: "4",
+              reps: "6",
+              carga: "100 kg",
+              rir: "Con margen",
+              descanso: "2 min",
               previo: "Antes: barra sola × 8, 60 kg × 5 y 80 kg × 3. El peso es de referencia: tienen que sobrarte varias repeticiones. Si te queda muy liviano, podés subir 5 kg, no más.",
               indicaciones: [
                 "Bracing antes de despegar la barra del piso.",
@@ -307,29 +1910,51 @@ const RUTINA = {
               ]
             },
             {
-              nombre: "Sentadilla búlgara",
-              descripcion: { musculos: "Cuádriceps y glúteos de la pierna de adelante; aductores y zona media como estabilizadores.", pasos: ["De espaldas a un banco, apoyá el empeine de un pie sobre él.", "Adelantá la otra pierna lo suficiente para que, al bajar, la rodilla quede más o menos sobre el pie.", "Con una mancuerna en cada mano, bajá en vertical hasta que la rodilla de atrás se acerque al piso.", "Subí empujando con el pie de adelante. Completá las reps y cambiá de pierna."] },
-              series: "4", reps: "10 por pierna", carga: "12-14 kg c/u", rir: "2", descanso: "90 s",
-              indicaciones: ["Pie de atrás sobre el banco. El peso va en la pierna de adelante.", "Rodilla alineada con el pie, pelvis nivelada y bajada controlada."]
+              id: "sentadilla-bulgara-mancuernas",
+              series: "4",
+              reps: "10 por pierna",
+              carga: "12-14 kg c/u",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: [
+                "Pie de atrás sobre el banco. El peso va en la pierna de adelante.",
+                "Rodilla alineada con el pie, pelvis nivelada y bajada controlada."
+              ]
             },
             {
-              nombre: "Pantorrillas a una pierna en el banco",
-              descripcion: { musculos: "Gemelos y sóleo (pantorrilla).", pasos: ["Apoyá la parte delantera de un pie en el borde de un banco o escalón; el talón queda en el aire.", "Mancuerna en la mano del lado que trabaja; la otra mano apoyada para el equilibrio.", "Bajá el talón lento por debajo del borde, quedate 1-2 s estirando y subí en punta de pie lo más alto que puedas."] },
-              series: "3", reps: "15 por pierna", carga: "1 mancuerna", rir: "2", descanso: "45-60 s",
-              indicaciones: ["De pie en el borde de un banco o escalón, mancuerna del lado de la pierna que trabaja y la otra mano apoyada.", "Bajá lento, quedate 1-2 s abajo estirando y subí. Sin rebotes."]
+              id: "pantorrilla-unilateral-banco",
+              series: "3",
+              reps: "15 por pierna",
+              carga: "1 mancuerna",
+              rir: "2",
+              descanso: "45-60 s",
+              indicaciones: [
+                "De pie en el borde de un banco o escalón, mancuerna del lado de la pierna que trabaja y la otra mano apoyada.",
+                "Bajá lento, quedate 1-2 s abajo estirando y subí. Sin rebotes."
+              ]
             },
-            // SUPERSERIE: dos ejercicios con el mismo grupo (A1, A2) se hacen seguidos, sin pausa.
             {
-              nombre: "Curl con barra EZ", grupo: "A1",
-              descripcion: { musculos: "Bíceps y braquial (flexores del codo).", pasos: ["De pie, agarrá la barra EZ por la parte curva, palmas hacia arriba, al ancho de hombros.", "Brazos estirados y codos pegados al costado del cuerpo.", "Flexioná los codos llevando la barra hacia los hombros y bajá controlado hasta estirar."] },
-              series: "4", reps: "10", carga: "20-25 kg", rir: "3 → cerca del fallo", descanso: "Sin pausa",
+              id: "curl-barra-ez",
+              grupo: "A1",
+              series: "4",
+              reps: "10",
+              carga: "20-25 kg",
+              rir: "3 → cerca del fallo",
+              descanso: "Sin pausa",
               previo: "Superserie con el curl martillo: 10 curls con barra EZ y, sin pausa, 10 de martillo por brazo. 4 vueltas.",
-              indicaciones: ["Vueltas 1-2: RIR 3 en la barra. Vueltas 3-4: apretá hasta cerca del fallo.", "Codos fijos al costado del cuerpo, sin balancear el tronco."]
+              indicaciones: [
+                "Vueltas 1-2: RIR 3 en la barra. Vueltas 3-4: apretá hasta cerca del fallo.",
+                "Codos fijos al costado del cuerpo, sin balancear el tronco."
+              ]
             },
             {
-              nombre: "Curl martillo", grupo: "A2",
-              descripcion: { musculos: "Braquiorradial (antebrazo), braquial y bíceps.", pasos: ["De pie, una mancuerna en cada mano, palmas mirándose entre sí (agarre neutro).", "Codos pegados al costado del cuerpo.", "Flexioná el codo subiendo la mancuerna sin girar la muñeca y bajá controlado."] },
-              series: "4", reps: "10 por brazo", carga: "10-12 kg", rir: "3 → cerca del fallo", descanso: "90 s por vuelta",
+              id: "curl-martillo",
+              grupo: "A2",
+              series: "4",
+              reps: "10 por brazo",
+              carga: "10-12 kg",
+              rir: "3 → cerca del fallo",
+              descanso: "90 s por vuelta",
               indicaciones: ["Va justo después del curl con barra EZ, sin pausa.", "Codos fijos al costado del cuerpo, sin balancear el tronco."]
             }
           ]
@@ -337,25 +1962,33 @@ const RUTINA = {
         {
           nombre: "Cardio",
           ejercicios: [
-            { nombre: "Bici continua", descripcion: { musculos: "Trabajo aeróbico a intensidad moderada.", pasos: ["Ajustá el sillín: con el pedal abajo, la rodilla queda apenas flexionada.", "Pedaleá a ritmo constante y regulá con la prueba del habla."] }, dosis: "15 min", nota: "Tenés que poder hablar con frases cortas. Si charlás cómodo, subí un poco. Si solo te salen palabras sueltas, bajá." }
+            {
+              id: "bici",
+              nombre: "Bici continua",
+              dosis: "15 min",
+              nota: "Tenés que poder hablar con frases cortas. Si charlás cómodo, subí un poco. Si solo te salen palabras sueltas, bajá."
+            }
           ]
         },
         {
           nombre: "Estiramientos",
           nota: "Tensión cómoda, sin rebotes y respirando lento.",
           ejercicios: [
-            { nombre: "Cuádriceps en pared", descripcion: { musculos: "Estirar la parte de adelante del muslo.", pasos: ["Arrodillate de espaldas a una pared y apoyá el empeine de una pierna en ella.", "Adelantá la otra pierna con el pie apoyado.", "Subí el tronco de a poco sin arquear la lumbar, hasta sentir tensión en el muslo."] }, dosis: "30 s por pierna" },
-            { nombre: "Sentado con banda en la planta del pie", descripcion: { musculos: "Estirar la parte de atrás del muslo (isquiosurales) y la pantorrilla.", pasos: ["Sentado en el piso con una pierna estirada, pasá la banda por la planta de ese pie.", "Espalda larga; tirá suave de la banda llevando la punta del pie hacia vos.", "Si no sentís tensión, inclinate un poco hacia adelante desde la cadera."] }, dosis: "30 s por pierna", nota: "Pierna estirada, llevá la punta del pie hacia vos: estira isquios y gemelo." },
-            { nombre: "Figure Four (glúteos)", descripcion: { musculos: "Estirar glúteos y cadera.", pasos: ["Acostado boca arriba, apoyá un tobillo sobre la rodilla contraria (forma de 4).", "Agarrá el muslo de la pierna de abajo y acercalo al pecho."] }, dosis: "30 s por lado" },
-            { nombre: "Butterfly (aductores)", descripcion: { musculos: "Estirar la cara interna del muslo.", pasos: ["Sentado, juntá las plantas de los pies y dejá caer las rodillas hacia los costados.", "Espalda larga. Podés empujar suave las rodillas hacia abajo con los codos."] }, dosis: "30 s" },
-            { nombre: "Bíceps en pared", descripcion: { musculos: "Estirar el bíceps y la parte delantera del hombro.", pasos: ["De costado a una pared, apoyá la palma con el brazo estirado a la altura del hombro o un poco más abajo, dedos hacia atrás.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el bíceps."] }, dosis: "30 s por brazo" }
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna" },
+            {
+              id: "estiramiento-isquios-sentado-banda",
+              dosis: "30 s por pierna",
+              nota: "Pierna estirada, llevá la punta del pie hacia vos: estira isquios y gemelo."
+            },
+            { id: "estiramiento-figure-four", dosis: "30 s por lado" },
+            { id: "estiramiento-mariposa", dosis: "30 s" },
+            { id: "estiramiento-biceps-pared", dosis: "30 s por brazo" }
           ]
         }
       ]
     },
     {
       nombre: "Día 4 · Pecho y espalda",
-      // Como el Día 3: sin objetivo/duración/intensidad en el PDF, y con reglas propias.
       reglas: [
         "Nada al fallo. Si dudás, elegí la carga más baja.",
         "RIR: al terminar la serie preguntate \"¿cuántas más me salían con buena técnica?\". Ese número es el RIR.",
@@ -366,12 +1999,24 @@ const RUTINA = {
           nombre: "Calentamiento",
           nota: "Hacelo en este orden, de arriba hacia abajo.",
           ejercicios: [
-            { nombre: "Movilidad articular general", descripcion: { musculos: "Lubricar las articulaciones y preparar el cuerpo para moverse.", pasos: ["Empezá por los tobillos: círculos hacia un lado y hacia el otro.", "Seguí subiendo: rodillas, cadera, columna, hombros, codos y muñecas.", "Movimientos suaves y amplios, sin forzar. Cuello solo hacia los lados."] }, dosis: "2-3 min", nota: "De abajo hacia arriba, suave. Más tiempo en hombros y columna." },
-            { nombre: "Remo suave", descripcion: { musculos: "Entrar en calor con todo el cuerpo.", pasos: ["Pies atados en los apoyos, agarrá el manillar.", "Ida: piernas → tronco → brazos. Vuelta: brazos → tronco → piernas.", "Ritmo cómodo: tenés que poder hablar sin problema."] }, dosis: "5 min", nota: "Ritmo cómodo: tenés que poder hablar sin problema." },
-            { nombre: "Rotaciones torácicas en cuadrupedia", descripcion: { musculos: "Movilizar la parte alta de la columna antes de los presses y los remos.", pasos: ["En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.", "Llevá una mano a la nuca.", "Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada. Volvé y repetí."] }, dosis: "6 por lado", nota: "Una mano en la nuca. Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada." },
-            { nombre: "Gato-vaca", descripcion: { musculos: "Movilizar toda la columna, vértebra por vértebra.", pasos: ["En cuatro apoyos: manos bajo los hombros, rodillas bajo la cadera.", "Exhalá y redondeá la espalda hacia arriba, mentón hacia el pecho.", "Inhalá y hundí la espalda suave, mirada hacia adelante.", "Alterná lento, sin llegar al tope del movimiento."] }, dosis: "8 ciclos", nota: "Redondeá la espalda hacia arriba y después hundila suave. Lento y sin llegar al tope." },
-            { nombre: "Activación de dorsal con banda", descripcion: { musculos: "Activar el dorsal ancho y aprender a bajar el hombro antes de los tirones.", pasos: ["Banda atada a la altura de la cadera, de frente al poste.", "Brazo estirado adelante, agarrando la banda.", "Llevá la mano hacia atrás, hacia el bolsillo, con el brazo estirado y el hombro lejos de la oreja.", "Volvé lento. Completá las reps y cambiá de brazo."] }, dosis: "2 × 10 por lado", nota: "Banda a la altura de la cadera, brazo estirado. Llevá la mano hacia el \"bolsillo\" con el hombro lejos de la oreja." },
-            { nombre: "Plancha frontal + lateral", descripcion: { musculos: "Activar la zona media antes de cargar peso.", pasos: ["Frontal: antebrazos y puntas de los pies apoyados, cuerpo en línea recta de cabeza a talones.", "Sin descansar, girá hacia un costado: un antebrazo apoyado, pies uno sobre otro, cadera arriba.", "Pasá al otro lado. Abdomen firme y sin dejar caer la cadera."] }, dosis: "2 series · 30 s cada posición", nota: "Seguidas: frontal, lateral derecha y lateral izquierda. Abdomen firme." }
+            { id: "movilidad-articular-general", dosis: "2-3 min", nota: "De abajo hacia arriba, suave. Más tiempo en hombros y columna." },
+            { id: "remo-ergometro", dosis: "5 min", nota: "Ritmo cómodo: tenés que poder hablar sin problema." },
+            {
+              id: "rotaciones-toracicas-cuadrupedia",
+              dosis: "6 por lado",
+              nota: "Una mano en la nuca. Girá el tronco abriendo el codo hacia el techo y seguilo con la mirada."
+            },
+            { id: "gato-vaca", dosis: "8 ciclos", nota: "Redondeá la espalda hacia arriba y después hundila suave. Lento y sin llegar al tope." },
+            {
+              id: "activacion-dorsal-banda",
+              dosis: "2 × 10 por lado",
+              nota: "Banda a la altura de la cadera, brazo estirado. Llevá la mano hacia el \"bolsillo\" con el hombro lejos de la oreja."
+            },
+            {
+              id: "plancha-frontal-lateral",
+              dosis: "2 series · 30 s cada posición",
+              nota: "Seguidas: frontal, lateral derecha y lateral izquierda. Abdomen firme."
+            }
           ]
         },
         {
@@ -379,9 +2024,13 @@ const RUTINA = {
           principal: true,
           ejercicios: [
             {
-              nombre: "Press banca plano con barra",
-              descripcion: { musculos: "Pecho, hombro anterior y tríceps.", pasos: ["Acostate en el banco con los ojos debajo de la barra y los pies apoyados en el piso.", "Agarrá la barra un poco más ancho que los hombros y juntá las escápulas.", "Sacá la barra del rack y llevala sobre los hombros con los brazos estirados.", "Bajala controlada hasta tocar el pecho y empujá hasta volver a estirar los brazos."] }, destacado: true,
-              series: "4", reps: "6", carga: "60 kg", rir: "~5", descanso: "2 min",
+              id: "press-banca-barra",
+              destacado: true,
+              series: "4",
+              reps: "6",
+              carga: "60 kg",
+              rir: "~5",
+              descanso: "2 min",
               previo: "Antes: barra × 10, 40 kg × 5 y 50 kg × 3. El peso es de referencia: tienen que sobrarte varias repeticiones.",
               indicaciones: [
                 "Pies firmes, escápulas juntas y apoyadas en el banco.",
@@ -389,16 +2038,25 @@ const RUTINA = {
               ]
             },
             {
-              nombre: "Aperturas con mancuernas",
-              descripcion: { musculos: "Pecho y hombro anterior.", pasos: ["Acostado en banco plano, mancuernas arriba del pecho con las palmas enfrentadas.", "Codos levemente flexionados: esa flexión no cambia en todo el movimiento.", "Abrí los brazos en arco hacia los costados hasta la línea del hombro.", "Volvé por el mismo arco hasta juntar las mancuernas sobre el pecho."] },
-              series: "4", reps: "8", carga: "Según RIR", rir: "2-3", descanso: "90 s",
+              id: "aperturas-mancuernas",
+              series: "4",
+              reps: "8",
+              carga: "Según RIR",
+              rir: "2-3",
+              descanso: "90 s",
               indicaciones: ["Codos levemente flexionados durante todo el movimiento.", "Bajá solo hasta la línea del hombro, sin forzar el estiramiento."]
             },
             {
-              nombre: "Cruce de poleas de arriba hacia abajo",
-              descripcion: { musculos: "Pecho (sobre todo la parte baja) y hombro anterior.", pasos: ["Poleas en lo alto, un agarre en cada mano. Parate en el medio con un pie adelante y el tronco apenas inclinado.", "Brazos abiertos y codos levemente flexionados.", "Llevá las manos en arco hacia abajo y adelante hasta juntarlas frente a la cadera.", "Volvé lento hasta abrir los brazos, sin que las poleas te tiren hacia atrás."] },
-              series: "3", reps: "12", carga: "Según RIR", rir: "2", descanso: "60-75 s",
-              indicaciones: ["Poleas arriba, un pie adelante. Llevá las manos hacia abajo y adelante hasta juntarlas frente a la cadera.", "Apretá el pecho 1 segundo abajo y volvé lento."]
+              id: "cruce-poleas-arriba-abajo",
+              series: "3",
+              reps: "12",
+              carga: "Según RIR",
+              rir: "2",
+              descanso: "60-75 s",
+              indicaciones: [
+                "Poleas arriba, un pie adelante. Llevá las manos hacia abajo y adelante hasta juntarlas frente a la cadera.",
+                "Apretá el pecho 1 segundo abajo y volvé lento."
+              ]
             }
           ]
         },
@@ -407,9 +2065,12 @@ const RUTINA = {
           principal: true,
           ejercicios: [
             {
-              nombre: "Remo con barra · codos pegados",
-              descripcion: { musculos: "Dorsal ancho, espalda media y bíceps; zona media y lumbar como estabilizadoras.", pasos: ["De pie, barra agarrada con las palmas hacia abajo, al ancho de los hombros.", "Flexioná un poco las rodillas e inclinate desde la cadera hasta unos 45°, espalda neutra.", "Tirá la barra hacia el abdomen con los codos pegados al cuerpo.", "Bajá controlado hasta estirar los brazos, sin mover el tronco."] },
-              series: "4", reps: "8", carga: "45 kg", rir: "4", descanso: "2 min",
+              id: "remo-barra-codos-pegados",
+              series: "4",
+              reps: "8",
+              carga: "45 kg",
+              rir: "4",
+              descanso: "2 min",
               indicaciones: [
                 "Palmas hacia abajo, al ancho de los hombros. Tronco a unos 45° y rodillas levemente flexionadas.",
                 "Tirá la barra hacia el abdomen, debajo del ombligo, con los codos pegados al cuerpo.",
@@ -417,62 +2078,95 @@ const RUTINA = {
               ]
             },
             {
-              nombre: "Jalón al pecho",
-              descripcion: { musculos: "Dorsal ancho, espalda media y bíceps.", pasos: ["Sentate en la máquina con los muslos trabados bajo los apoyos.", "Agarrá la barra un poco más ancho que los hombros.", "Tirá la barra hacia la parte alta del pecho llevando los codos hacia abajo y volvé lento hasta estirar los brazos."] },
-              series: "4", reps: "10", carga: "45 kg", rir: "2-3", descanso: "90 s",
+              id: "jalon-pecho",
+              series: "4",
+              reps: "10",
+              carga: "45 kg",
+              rir: "2-3",
+              descanso: "90 s",
               indicaciones: ["Hombros lejos de las orejas. Llevá los codos hacia abajo.", "Barra a la parte alta del pecho, sin balancear el tronco. Vuelta lenta."]
             },
             {
-              nombre: "Remo en polea baja · barra ancha, codos abiertos",
-              descripcion: { musculos: "Espalda media y alta (romboides y trapecio medio) y hombro posterior.", pasos: ["Sentate frente a la polea con los pies apoyados y las rodillas levemente flexionadas.", "Agarrá la barra ancha con las palmas hacia abajo, brazos estirados y espalda erguida.", "Tirá hacia la parte baja del pecho abriendo los codos hacia los costados.", "Volvé lento hasta estirar los brazos, sin inclinar el tronco."] },
-              series: "3", reps: "12", carga: "Según RIR", rir: "2", descanso: "75 s",
-              indicaciones: ["Sentado, espalda erguida. Agarre ancho con las palmas hacia abajo.", "Tirá hacia la parte baja del pecho con los codos abiertos. Pausa de 1 segundo juntando las escápulas y vuelta lenta, sin balancear el tronco."]
+              id: "remo-polea-baja-barra-ancha",
+              series: "3",
+              reps: "12",
+              carga: "Según RIR",
+              rir: "2",
+              descanso: "75 s",
+              indicaciones: [
+                "Sentado, espalda erguida. Agarre ancho con las palmas hacia abajo.",
+                "Tirá hacia la parte baja del pecho con los codos abiertos. Pausa de 1 segundo juntando las escápulas y vuelta lenta, sin balancear el tronco."
+              ]
             }
           ]
         },
         {
-          // Bloque simple (sin registro): el PDF no pide anotar el core.
           nombre: "Core",
           nota: "En este orden. Si se arquea la espalda, frená.",
           ejercicios: [
-            { nombre: "Stir the pot", descripcion: { musculos: "Estabilidad de la zona media: el tronco resiste mientras los brazos se mueven.", pasos: ["Antebrazos apoyados sobre la fitball y pies atrás, en posición de plancha.", "Cuerpo en línea recta y abdomen firme.", "Dibujá círculos chicos con los antebrazos moviendo la pelota, como si revolvieras una olla.", "20 s hacia un lado y 20 s hacia el otro."] }, dosis: "2 series · 20 s por lado", nota: "El tronco no se mueve. 45 s de descanso." },
-            { nombre: "Rueda abdominal", descripcion: { musculos: "Zona media completa, sobre todo el recto abdominal trabajando contra la extensión de la lumbar.", pasos: ["De rodillas, con la rueda en el piso debajo de los hombros.", "Abdomen apretado y pelvis levemente metida.", "Avanzá la rueda estirando el cuerpo hasta donde la lumbar no se hunda.", "Volvé tirando con el abdomen, no con la cadera."] }, dosis: "2 × 8", nota: "Desde rodillas. Avanzá solo hasta donde la lumbar no se hunde y volvé con el abdomen. 60 s de descanso." },
-            { nombre: "Circuito de zona baja", descripcion: { musculos: "Abdomen (parte baja) y flexores de cadera, con la lumbar pegada al piso.", pasos: ["Hollow hold: boca arriba, lumbar pegada al piso, hombros y piernas despegados del suelo. Quedate quieto.", "Pataditas cortas: misma posición, piernas estiradas moviéndose arriba y abajo, alternadas y cortitas.", "Tijeras cruzadas: piernas estiradas que se cruzan una sobre otra hacia los costados.", "Si la lumbar se despega, subí más las piernas."] }, dosis: "3 vueltas · 20 s trabajo / 10 s descanso", nota: "Hollow hold → pataditas cortas → tijeras cruzadas. 45 s entre vueltas. Lumbar pegada al piso: si se despega, subí las piernas." }
+            { id: "stir-the-pot", dosis: "2 series · 20 s por lado", nota: "El tronco no se mueve. 45 s de descanso." },
+            {
+              id: "rueda-abdominal",
+              dosis: "2 × 8",
+              nota: "Desde rodillas. Avanzá solo hasta donde la lumbar no se hunde y volvé con el abdomen. 60 s de descanso."
+            },
+            {
+              id: "circuito-zona-baja",
+              dosis: "3 vueltas · 20 s trabajo / 10 s descanso",
+              nota: "Hollow hold → pataditas cortas → tijeras cruzadas. 45 s entre vueltas. Lumbar pegada al piso: si se despega, subí las piernas."
+            }
           ]
         },
         {
           nombre: "Estiramientos",
           nota: "Tensión cómoda, sin rebotes y respirando lento.",
           ejercicios: [
-            { nombre: "Pectoral en pared", descripcion: { musculos: "Estirar pecho y parte delantera del hombro.", pasos: ["Apoyá el antebrazo en una pared o marco de puerta, codo a la altura del hombro.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el pecho."] }, dosis: "30 s por lado" },
-            { nombre: "Dorsal ancho sobre banco", descripcion: { musculos: "Estirar la espalda (dorsales).", pasos: ["De rodillas frente a un banco, apoyá las manos en él.", "Llevá la cadera hacia atrás y dejá bajar el pecho hacia el piso."] }, dosis: "30-45 s", nota: "Manos en el banco, llevá la cadera atrás y dejá bajar el pecho." },
-            { nombre: "Brazo cruzado delante del pecho", descripcion: { musculos: "Estirar la parte de atrás del hombro.", pasos: ["Cruzá un brazo estirado por delante del pecho.", "Con el otro brazo acercalo hacia el cuerpo, sin subir el hombro."] }, dosis: "30 s por brazo", nota: "Parte de atrás del hombro." },
-            { nombre: "Bíceps en pared", descripcion: { musculos: "Estirar el bíceps y la parte delantera del hombro.", pasos: ["De costado a una pared, apoyá la palma con el brazo estirado a la altura del hombro o un poco más abajo, dedos hacia atrás.", "Girá el tronco suave hacia el lado contrario hasta sentir tensión en el bíceps."] }, dosis: "30 s por brazo" },
-            { nombre: "Child's Pose", descripcion: { musculos: "Relajar y estirar suave la espalda.", pasos: ["De rodillas, sentate sobre los talones.", "Llevá el tronco hacia adelante y estirá los brazos en el piso.", "Frente apoyada y respiración lenta."] }, dosis: "30-45 s", nota: "Para relajar la espalda después de los remos." }
+            { id: "estiramiento-pectoral-pared", dosis: "30 s por lado" },
+            { id: "estiramiento-dorsal-banco", dosis: "30-45 s", nota: "Manos en el banco, llevá la cadera atrás y dejá bajar el pecho." },
+            { id: "estiramiento-brazo-cruzado", dosis: "30 s por brazo", nota: "Parte de atrás del hombro." },
+            { id: "estiramiento-biceps-pared", dosis: "30 s por brazo" },
+            { id: "estiramiento-postura-nino", dosis: "30-45 s", nota: "Para relajar la espalda después de los remos." }
           ]
         }
       ]
-    }
-    ,
+    },
     {
       nombre: "Día 5 · WOD viernes",
       objetivo: "Un cardio exigente: que te ahogues y te cueste, pero sin terminar destruido. Antes, el peso muerto rumano con la técnica fresca. Después: sábado y domingo libres.",
       duracion: "~60 min",
-      // NUEVO: preguntas "antes de empezar". Se anotan igual que cualquier campo y salen en el resumen.
-      antes: [
-        { etiqueta: "¿Cómo llegaste? Dolor muscular de la búlgara (0-10)", placeholder: "0-10" }
-      ],
+      antes: [{ etiqueta: "¿Cómo llegaste? Dolor muscular de la búlgara (0-10)", placeholder: "0-10" }],
       bloques: [
         {
           nombre: "Calentamiento",
           ejercicios: [
-            { nombre: "Bici suave", descripcion: { musculos: "Subir la temperatura corporal y encontrar el ritmo suave que vas a usar en los intervalos.", pasos: ["Ajustá el sillín: con el pedal abajo, la rodilla queda apenas flexionada.", "Resistencia baja. Contá cuántas veces baja el pie derecho en 10 s."] }, dosis: "5 min", nota: "Resistencia baja, RPE 3-4. Contá cuántas veces baja el pie derecho en 10 s: 10-12 es el ritmo suave que vas a usar después." },
-            { nombre: "Movilidad de la rana", descripcion: { musculos: "Movilizar la cadera y estirar los aductores (cara interna del muslo).", pasos: ["En cuatro apoyos, abrí las rodillas todo lo que puedas cómodo, pies hacia afuera.", "Manos o antebrazos apoyados en el piso.", "Llevá la cadera hacia atrás, hacia los talones, y volvé hacia adelante.", "Balanceo suave, sin rebotar ni forzar."] }, dosis: "10 balanceos", nota: "Que se mueva la cadera, no la zona lumbar: la espalda queda recta." },
-            // Los pasos de la caminata del elefante son TUYOS (vienen del PDF), no un borrador.
-            { nombre: "Caminata del elefante", descripcion: { musculos: "Estirar la parte de atrás de los muslos y los gemelos, y activar hombros y zona media.", pasos: ["De pie, flexioná el tronco y apoyá las manos en el piso, lo más cerca de los pies que puedas. Si no llegás, flexioná un poco las rodillas.", "Subí la cadera bien alta: el cuerpo queda como una \"V\" invertida.", "Sin bajar la cadera, avanzá caminando con manos y pies: mano derecha y pie izquierdo, después mano izquierda y pie derecho. Pasos cortos.", "Mantené las piernas lo más estiradas que puedas: vas a sentir que tira detrás de los muslos y en los gemelos.", "Lento y sin rebotes. Si te tira la zona lumbar, flexioná un poco las rodillas."] }, dosis: "2 × 10 m", nota: "Cadera alta, forma de \"V\" invertida (no como plancha). Volvé caminando normal entre las dos pasadas." },
-            { nombre: "Bisagra de cadera sin peso", descripcion: { musculos: "Ensayar el gesto del peso muerto rumano: mover la cadera sin mover la espalda.", pasos: ["De pie, pies al ancho de cadera, manos en la cintura.", "Rodillas apenas flexionadas y fijas.", "Llevá la cadera hacia atrás inclinando el tronco con la espalda recta, hasta sentir tensión detrás del muslo.", "Volvé a la posición inicial apretando glúteos."] }, dosis: "10", nota: "Rodillas apenas flexionadas, cadera atrás con la espalda recta y volvé apretando glúteos." },
-            { nombre: "Puente de glúteos", descripcion: { musculos: "Activar glúteos y preparar la extensión de cadera.", pasos: ["Acostado boca arriba, rodillas flexionadas y plantas apoyadas.", "Subí la pelvis apretando los glúteos hasta formar una línea de rodillas a hombros.", "Bajá lento sin arquear la zona lumbar."] }, dosis: "12", nota: "Apretá glúteos arriba y bajá controlado." },
-            { nombre: "Rumano de aproximación", descripcion: { musculos: "Preparar el peso muerto rumano con poca carga.", pasos: ["Mismo gesto que el trabajo principal: rodillas apenas flexionadas, cadera atrás y barra pegada a las piernas."] }, dosis: "Barra sola × 8 · 40 kg × 6", nota: "Mismo gesto que el trabajo principal, con poca carga." }
+            {
+              id: "bici",
+              nombre: "Bici suave",
+              dosis: "5 min",
+              nota: "Resistencia baja, RPE 3-4. Contá cuántas veces baja el pie derecho en 10 s: 10-12 es el ritmo suave que vas a usar después."
+            },
+            { id: "movilidad-rana", dosis: "10 balanceos", nota: "Que se mueva la cadera, no la zona lumbar: la espalda queda recta." },
+            {
+              id: "caminata-elefante",
+              dosis: "2 × 10 m",
+              nota: "Cadera alta, forma de \"V\" invertida (no como plancha). Volvé caminando normal entre las dos pasadas."
+            },
+            {
+              id: "bisagra-cadera-sin-peso",
+              dosis: "10",
+              nota: "Rodillas apenas flexionadas, cadera atrás con la espalda recta y volvé apretando glúteos."
+            },
+            { id: "puente-gluteos", dosis: "12", nota: "Apretá glúteos arriba y bajá controlado." },
+            {
+              id: "peso-muerto-rumano-barra",
+              nombre: "Rumano de aproximación",
+              descripcion: {
+                musculos: "Preparar el peso muerto rumano con poca carga.",
+                pasos: ["Mismo gesto que el trabajo principal: rodillas apenas flexionadas, cadera atrás y barra pegada a las piernas."]
+              },
+              dosis: "Barra sola × 8 · 40 kg × 6",
+              nota: "Mismo gesto que el trabajo principal, con poca carga."
+            }
           ]
         },
         {
@@ -480,10 +2174,14 @@ const RUTINA = {
           principal: true,
           ejercicios: [
             {
-              nombre: "Peso muerto rumano",
-              descripcion: { musculos: "Isquiosurales y glúteos; espalda y zona media como estabilizadoras.", pasos: ["De pie, barra agarrada con las palmas hacia vos, al ancho de los hombros, apoyada en los muslos.", "Rodillas apenas flexionadas: esa flexión no cambia en todo el movimiento.", "Llevá la cadera hacia atrás y bajá la barra pegada a las piernas, con la espalda recta.", "Cuando no puedas bajar más sin redondear la espalda, volvé empujando la cadera hacia adelante y apretando glúteos."] }, destacado: true,
-              series: "4", reps: "10", carga: "50-60 kg", rir: "3-4", descanso: "2 min",
-              rirPorSerie: true,   // NUEVO: el PDF pide el RIR de cada serie, no solo de la última
+              id: "peso-muerto-rumano-barra",
+              destacado: true,
+              series: "4",
+              reps: "10",
+              carga: "50-60 kg",
+              rir: "3-4",
+              descanso: "2 min",
+              rirPorSerie: true,
               previo: "Bajada en 3 segundos, sintiendo el estiramiento detrás del muslo. Subida normal. Si te sobran muchas y la técnica sale perfecta, subí 5-10 kg en la segunda serie.",
               indicaciones: [
                 "Rodillas apenas flexionadas y fijas: no es una sentadilla.",
@@ -501,16 +2199,31 @@ const RUTINA = {
           nota: "Primero elegís tu nivel y después hacés el bloque principal con ese nivel.",
           ejercicios: [
             {
+              id: "bici",
               nombre: "Paso 1 · Elegí tu nivel",
-              descripcion: { musculos: "Encontrar la resistencia justa para los intervalos: fuerte, pero sostenible.", pasos: ["Hacé 3 tramos de 20 s rápidos, subiendo la resistencia en cada uno.", "Entre tramos, 40 s suaves.", "Quedate con el nivel del tramo que se sintió fuerte, pero que podías aguantar más."] },
+              descripcion: {
+                musculos: "Encontrar la resistencia justa para los intervalos: fuerte, pero sostenible.",
+                pasos: [
+                  "Hacé 3 tramos de 20 s rápidos, subiendo la resistencia en cada uno.",
+                  "Entre tramos, 40 s suaves.",
+                  "Quedate con el nivel del tramo que se sintió fuerte, pero que podías aguantar más."
+                ]
+              },
               dosis: "3 × 20 s",
               nota: "20 s rápidos (unas 15-17 pedaladas en 10 s) y 40 s suaves entre tramos. Elegí el nivel del tramo que se sintió fuerte, pero que podías aguantar más.",
-              // NUEVO: campos para anotar en un ejercicio que no tiene series ni kg
-              anotar: [ { etiqueta: "Nivel o resistencia que elegiste", placeholder: "nivel" } ]
+              anotar: [{ etiqueta: "Nivel o resistencia que elegiste", placeholder: "nivel" }]
             },
             {
+              id: "bici",
               nombre: "Paso 2 · El bloque principal",
-              descripcion: { musculos: "Trabajo cardiovascular exigente por intervalos.", pasos: ["30 s fuerte con el nivel que elegiste, lo más rápido que puedas sostener en los 15 tramos.", "30 s suave: resistencia baja, sin dejar de pedalear.", "Repetí hasta completar 15 tramos (15 min)."] },
+              descripcion: {
+                musculos: "Trabajo cardiovascular exigente por intervalos.",
+                pasos: [
+                  "30 s fuerte con el nivel que elegiste, lo más rápido que puedas sostener en los 15 tramos.",
+                  "30 s suave: resistencia baja, sin dejar de pedalear.",
+                  "Repetí hasta completar 15 tramos (15 min)."
+                ]
+              },
               dosis: "15 tramos · 30 s fuerte + 30 s suave · 15 min",
               indicaciones: [
                 "No salgas a fondo en los primeros tramos. Al principio va a parecer fácil.",
@@ -529,21 +2242,36 @@ const RUTINA = {
         {
           nombre: "Core",
           ejercicios: [
-            { nombre: "Pesa rusa en el pecho + elevación de rodilla", descripcion: { musculos: "Zona media (sobre todo oblicuos) resistiendo la inclinación y la rotación; flexores de cadera.", pasos: ["De pie, pesa en posición de rack: manija en la palma, la pesa apoyada sobre el antebrazo y contra el pecho.", "Codo pegado a las costillas y muñeca recta. La pesa no se separa del cuerpo.", "Subí la rodilla del lado contrario, recta hacia adelante, y bajala. Repetí en el lugar.", "El tronco queda quieto: no se inclina ni gira.", "A los 45 s cambiá la pesa de lado y la pierna."] }, dosis: "2 rondas · 45 s por lado", nota: "Posición de rack: manija en la palma, la pesa sobre el antebrazo y contra el pecho, codo pegado a las costillas y muñeca recta. La pesa no se separa del cuerpo. El tronco no se inclina ni gira. Descanso: 30 s entre rondas. Carga: 12-16 kg.", anotar: [ { etiqueta: "Kg", placeholder: "kg" } ] },
-            { nombre: "Pesa rusa arriba de la cabeza + elevación de rodilla", descripcion: { musculos: "Zona media y estabilidad del hombro con el brazo arriba; flexores de cadera.", pasos: ["De pie, pesa rusa arriba con el brazo extendido y pegado a la oreja.", "La pesa queda apoyada sobre el dorso del antebrazo, con la muñeca recta.", "Costillas abajo y abdomen firme.", "Subí la rodilla del lado contrario, recta hacia adelante, y bajala. Repetí en el lugar.", "A los 45 s cambiá de brazo y de pierna."] }, dosis: "2 rondas · 45 s por lado", nota: "Pesa apoyada sobre el dorso del antebrazo y muñeca recta. Costillas abajo y abdomen firme. Si para subir el brazo tenés que arquear la espalda, bajá el peso. Carga: 8-12 kg.", anotar: [ { etiqueta: "Kg", placeholder: "kg" } ] },
-            { nombre: "Tuck L-sit en el cajón", descripcion: { musculos: "Zona media, flexores de cadera y depresores del hombro (hombros abajo).", pasos: ["Sentado sobre el cajón, apoyá las manos al costado de la cadera.", "Brazos estirados y hombros abajo, lejos de las orejas.", "Empujá el cajón, despegá la cola y llevá las rodillas flexionadas hacia el pecho.", "Sostené la posición."] }, dosis: "3 × 20 s acumulados", nota: "Si se te caen, descansá unos segundos y completá los 20 s. Descanso: 40 s. Si sentís tirón en la zona lumbar, pará.", anotar: [ { etiqueta: "Segundos seguidos en la mejor serie", placeholder: "s" } ] }
+            {
+              id: "pesa-rusa-rack-rodilla",
+              dosis: "2 rondas · 45 s por lado",
+              nota: "Posición de rack: manija en la palma, la pesa sobre el antebrazo y contra el pecho, codo pegado a las costillas y muñeca recta. La pesa no se separa del cuerpo. El tronco no se inclina ni gira. Descanso: 30 s entre rondas. Carga: 12-16 kg.",
+              anotar: [{ etiqueta: "Kg", placeholder: "kg" }]
+            },
+            {
+              id: "pesa-rusa-overhead-rodilla",
+              dosis: "2 rondas · 45 s por lado",
+              nota: "Pesa apoyada sobre el dorso del antebrazo y muñeca recta. Costillas abajo y abdomen firme. Si para subir el brazo tenés que arquear la espalda, bajá el peso. Carga: 8-12 kg.",
+              anotar: [{ etiqueta: "Kg", placeholder: "kg" }]
+            },
+            {
+              id: "tuck-l-sit-cajon",
+              dosis: "3 × 20 s acumulados",
+              nota: "Si se te caen, descansá unos segundos y completá los 20 s. Descanso: 40 s. Si sentís tirón en la zona lumbar, pará.",
+              anotar: [{ etiqueta: "Segundos seguidos en la mejor serie", placeholder: "s" }]
+            }
           ]
         },
         {
           nombre: "Estiramientos",
           nota: "Tensión cómoda, sin rebotes y respirando lento.",
           ejercicios: [
-            { nombre: "Isquiosurales sentado", descripcion: { musculos: "Estirar la parte de atrás del muslo.", pasos: ["Sentado en el piso con una pierna estirada y la otra flexionada.", "Espalda recta: avanzá con el tronco hacia el pie de la pierna estirada desde la cadera.", "Pará donde sientas tensión, sin redondear la espalda."] }, dosis: "30 s por pierna", nota: "Pierna estirada, avanzá con el tronco recto." },
-            { nombre: "Figure Four (glúteos)", descripcion: { musculos: "Estirar glúteos y cadera.", pasos: ["Acostado boca arriba, apoyá un tobillo sobre la rodilla contraria (forma de 4).", "Agarrá el muslo de la pierna de abajo y acercalo al pecho."] }, dosis: "30 s por lado" },
-            { nombre: "Flexores de cadera en media rodilla", descripcion: { musculos: "Estirar los flexores de cadera (parte de adelante de la cadera).", pasos: ["Una rodilla apoyada en el piso y la otra pierna adelante, con el pie apoyado.", "Meté la pelvis hacia adentro (como si llevaras la cola hacia abajo) y apretá el glúteo de la pierna de atrás.", "Llevá el cuerpo apenas hacia adelante hasta sentir tensión adelante de la cadera, sin arquear la lumbar."] }, dosis: "30 s por lado", nota: "Pelvis hacia adentro." },
-            { nombre: "Cuádriceps en pared", descripcion: { musculos: "Estirar la parte de adelante del muslo.", pasos: ["Arrodillate de espaldas a una pared y apoyá el empeine de una pierna en ella.", "Adelantá la otra pierna con el pie apoyado.", "Subí el tronco de a poco sin arquear la lumbar, hasta sentir tensión en el muslo."] }, dosis: "30 s por pierna" },
-            { nombre: "Gemelos en pared", descripcion: { musculos: "Estirar la pantorrilla (gemelos).", pasos: ["De frente a la pared, manos apoyadas.", "Una pierna adelante flexionada y la otra atrás estirada, con el talón pegado al piso.", "Llevá la cadera hacia la pared hasta sentir tensión en la pantorrilla de atrás."] }, dosis: "30 s por pierna", nota: "Pierna de atrás estirada." },
-            { nombre: "Postura del niño", descripcion: { musculos: "Relajar y estirar suave la espalda baja.", pasos: ["De rodillas, sentate sobre los talones.", "Llevá el tronco hacia adelante y estirá los brazos en el piso.", "Frente apoyada y respiración lenta."] }, dosis: "30-45 s" }
+            { id: "estiramiento-isquios-sentado", dosis: "30 s por pierna", nota: "Pierna estirada, avanzá con el tronco recto." },
+            { id: "estiramiento-figure-four", dosis: "30 s por lado" },
+            { id: "estiramiento-flexor-cadera", dosis: "30 s por lado", nota: "Pelvis hacia adentro." },
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna" },
+            { id: "estiramiento-gemelo-pared", dosis: "30 s por pierna", nota: "Pierna de atrás estirada." },
+            { id: "estiramiento-postura-nino", dosis: "30-45 s" }
           ]
         }
       ]
@@ -551,10 +2279,23 @@ const RUTINA = {
   ]
 };
 
+// Lista de etapas: la primera es la que se abre al entrar.
+const RUTINAS = [ETAPA6, ADAPTACION];
+// RUTINA = la etapa que se está mirando ahora. Cambia con el selector.
+let RUTINA = RUTINAS[0];
+
 /* =========================================================
    3) JAVASCRIPT: la "lógica". Lee los datos de arriba y
    construye la pantalla. Si cambiás los datos, cambia la app.
    ========================================================= */
+
+// Une la prescripción del día con su ficha de la biblioteca.
+// Lo que trae la prescripción pisa lo de la biblioteca ("..." = copiar todos los campos).
+function resolver(prescripcion) {
+  const ficha = BIBLIOTECA[prescripcion.id];
+  if (!ficha) console.warn('Ejercicio sin ficha en la biblioteca:', prescripcion.id);
+  return { ...ficha, ...prescripcion };
+}
 
 // Link provisorio de vídeo: busca el ejercicio en YouTube.
 // Más adelante cada ejercicio de la biblioteca tendrá SU vídeo elegido por vos.
@@ -562,11 +2303,35 @@ function linkVideo(nombre) {
   return "https://www.youtube.com/results?search_query=" + encodeURIComponent(nombre + " técnica");
 }
 
+// "¿Cómo se hace?": para qué sirve, pasos y, si las hay, secciones extra
+// ("Está bien hecho si", "Error común"...). Si el ejercicio es nuevo, se abre solo.
+function bloqueDescripcion(ej, etiqueta) {
+  const d = ej.descripcion;
+  if (!d) return '';
+  return `
+      <details${ej.nuevo ? ' open' : ''}>
+        <summary>¿Cómo se hace?</summary>
+        <p class="detalle"><b>${etiqueta}</b> ${d.musculos}</p>
+        <ol>${d.pasos.map(p => `<li>${p}</li>`).join('')}</ol>
+        ${(d.secciones || []).map(sec => `
+          <div class="seccion-titulo">${sec.titulo}</div>
+          <p class="detalle">${sec.texto}</p>`).join('')}
+      </details>`;
+}
+
+const etiquetaNuevo = ej => ej.nuevo ? '<span class="etiqueta nuevo">NUEVO</span>' : '';
+
+// Vídeos: los de la biblioteca si los hay; si no, búsqueda en YouTube
+function enlacesVideo(ej) {
+  const videos = (ej.videos && ej.videos.length) ? ej.videos : [linkVideo(ej.nombre)];
+  return videos.map((url, k) => `<a class="video" href="${url}" target="_blank" rel="noopener">▶ Ver vídeo${videos.length > 1 ? ' ' + (k + 1) : ''}</a> `).join('');
+}
+
 // Dibuja un ejercicio del trabajo principal (con series, carga, RIR...)
 function tarjetaPrincipal(ej, idEj) {
   return `
     <div class="tarjeta${ej.grupo ? ' en-grupo' : ''}">
-      <h3>${ej.nombre}${ej.destacado ? '<span class="etiqueta">PRINCIPAL</span>' : ''}${ej.grupo ? `<span class="etiqueta grupo">SUPERSERIE ${ej.grupo}</span>` : ''}</h3>
+      <h3>${ej.nombre}${etiquetaNuevo(ej)}${ej.destacado ? '<span class="etiqueta">PRINCIPAL</span>' : ''}${ej.grupo ? `<span class="etiqueta grupo">SUPERSERIE ${ej.grupo}</span>` : ''}</h3>
       ${ej.previo ? `<p class="detalle">${ej.previo}</p>` : ''}
       <div class="presc">
         <div><span>Series×Reps</span><b>${ej.series}×${ej.reps}</b></div>
@@ -574,18 +2339,14 @@ function tarjetaPrincipal(ej, idEj) {
         <div><span>RIR</span><b>${ej.rir}</b></div>
         <div><span>Descanso</span><b>${ej.descanso}</b></div>
       </div>
-      ${ej.descripcion ? `
-      <details>
-        <summary>¿Cómo se hace?</summary>
-        <p class="detalle"><b>Trabaja:</b> ${ej.descripcion.musculos}</p>
-        <ol>${ej.descripcion.pasos.map(p => `<li>${p}</li>`).join('')}</ol>
-      </details>` : ''}
+      ${bloqueDescripcion(ej, 'Trabaja:')}
       <details>
         <summary>Indicaciones técnicas</summary>
         <ul>${ej.indicaciones.map(i => `<li>${i}</li>`).join('')}</ul>
       </details>
-      <a class="video" href="${linkVideo(ej.nombre)}" target="_blank" rel="noopener">▶ Ver vídeo</a>
+      ${enlacesVideo(ej)}
       ${formularioRegistro(ej, idEj)}
+      ${camposAnotar(ej.anotar, idEj)}
     </div>`;
 }
 
@@ -644,14 +2405,9 @@ function camposAnotar(campos, idBase) {
 function tarjetaSimple(ej, idEj) {
   return `
     <div class="tarjeta">
-      <h3>${ej.nombre}</h3>
+      <h3>${ej.nombre}${etiquetaNuevo(ej)}</h3>
       <p class="detalle"><b>${ej.dosis}</b>${ej.nota ? ' · ' + ej.nota : ''}</p>
-      ${ej.descripcion ? `
-      <details>
-        <summary>¿Cómo se hace?</summary>
-        <p class="detalle"><b>Para qué:</b> ${ej.descripcion.musculos}</p>
-        <ol>${ej.descripcion.pasos.map(p => `<li>${p}</li>`).join('')}</ol>
-      </details>` : ''}
+      ${bloqueDescripcion(ej, 'Para qué:')}
       ${ej.indicaciones ? `
       <details>
         <summary>Indicaciones</summary>
@@ -664,6 +2420,11 @@ function tarjetaSimple(ej, idEj) {
 // Dibuja un día completo
 function mostrarDia(indice) {
   const dia = RUTINA.dias[indice];
+  // Base de los identificadores: incluye la etapa, para que "Día 1" de una etapa
+  // no pise los datos de "Día 1" de otra en el borrador. Ej: "etapa6-fin-de-anio-d0"
+  const base = `${RUTINA.id}-d${indice}`;
+  // Si el día tiene reglas propias, se usan esas; si no, las generales de la etapa.
+  const reglas = dia.reglas || RUTINA.reglas;
 
   // Objetivo, duración e intensidad son opcionales: si el día no los trae, no se muestran.
   let html = `<h3 class="titulo-dia">${dia.nombre}</h3>`;
@@ -672,29 +2433,29 @@ function mostrarDia(indice) {
   if (dia.duracion) chips.push(`⏱ ${dia.duracion}`);
   if (dia.intensidad) chips.push(`💪 ${dia.intensidad}`);
   if (chips.length) html += `<div class="resumen">${chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>`;
-  if (dia.antes) html += `<h2>Antes de empezar</h2><div class="tarjeta">${camposAnotar(dia.antes, `d${indice}-antes`)}</div>`;
+  // Antes de empezar: las reglas (ahora arriba, se leen antes de entrenar) y las preguntas previas
+  html += `
+    <h2>Antes de empezar</h2>
+    <div class="tarjeta reglas"><ul>${reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+  if (dia.antes) html += `<div class="tarjeta">${camposAnotar(dia.antes, `${base}-antes`)}</div>`;
 
   dia.bloques.forEach((bloque, b) => {
     html += `<h2>${bloque.nombre}</h2>`;
     if (bloque.nota) html += `<p class="nota-bloque">${bloque.nota}</p>`;
-    bloque.ejercicios.forEach((ej, e) => {
+    if (bloque.reglas) html += `<div class="tarjeta reglas"><ul>${bloque.reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+    bloque.ejercicios.map(resolver).forEach((ej, e) => {
       // idEj identifica cada ejercicio de forma única: "d0-b1-e0" = día 0, bloque 1, ejercicio 0
-      const idEj = `d${indice}-b${b}-e${e}`;
+      const idEj = `${base}-b${b}-e${e}`;
       html += bloque.principal ? tarjetaPrincipal(ej, idEj) : tarjetaSimple(ej, idEj);
     });
+    if (bloque.cierre) html += `<div class="tarjeta cierre"><b>${bloque.cierre.titulo}</b>${bloque.cierre.texto}</div>`;
   });
 
-  // Si el día tiene reglas propias, se usan esas; si no, las generales de la semana.
-  const reglas = dia.reglas || RUTINA.reglas;
-
   html += `
-    <h2>Reglas de este día</h2>
-    <div class="tarjeta reglas"><ul>${reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>
-
     <h2>Cierre de la sesión</h2>
     <div class="tarjeta">
       <div class="registro-titulo">¿Cómo te sentiste? ¿Alguna molestia?</div>
-      <textarea placeholder="Ej: buena sesión, sentadilla cómoda, algo de carga en el hombro izquierdo…" data-id="d${indice}-nota"></textarea>
+      <textarea placeholder="Ej: buena sesión, sentadilla cómoda, algo de carga en el hombro izquierdo…" data-id="${base}-nota"></textarea>
       <button class="boton" onclick="generarResumen(${indice})">Terminar sesión</button>
       <p class="aviso">Lo que escribís se guarda solo en este móvil. Es una versión de prueba.</p>
       <div id="resumen"></div>
@@ -749,8 +2510,9 @@ function valor(id) {
 
 function generarResumen(indice) {
   const dia = RUTINA.dias[indice];
+  const base = `${RUTINA.id}-d${indice}`;
   const fecha = new Date().toLocaleDateString('es-ES');
-  let texto = `${RUTINA.cliente} · ${dia.nombre} · ${fecha}\n`;
+  let texto = `${CLIENTE} · ${RUTINA.etapa} · ${dia.nombre} · ${fecha}\n`;
 
   // Campos anotados: cada uno sale como "• Etiqueta: valor" (solo si se completó)
   const lineasAnotadas = (campos, idBase) => (campos || [])
@@ -758,19 +2520,19 @@ function generarResumen(indice) {
     .filter(([, v]) => v)
     .map(([etiqueta, v]) => `\n• ${etiqueta}: ${v}`).join('');
 
-  texto += lineasAnotadas(dia.antes, `d${indice}-antes`);
+  texto += lineasAnotadas(dia.antes, `${base}-antes`);
 
   dia.bloques.forEach((bloque, b) => {
     if (!bloque.principal) {
-      bloque.ejercicios.forEach((ej, e) => {
-        const idEj = `d${indice}-b${b}-e${e}`;
+      bloque.ejercicios.map(resolver).forEach((ej, e) => {
+        const idEj = `${base}-b${b}-e${e}`;
         const anotado = lineasAnotadas(ej.anotar, idEj);
         if (anotado) texto += `\n${ej.nombre}${anotado.replace(/\n• /g, '\n   – ')}`;
       });
       return;
     }
-    bloque.ejercicios.forEach((ej, e) => {
-      const idEj = `d${indice}-b${b}-e${e}`;
+    bloque.ejercicios.map(resolver).forEach((ej, e) => {
+      const idEj = `${base}-b${b}-e${e}`;
       const series = [];
       for (let s = 1; s <= (parseInt(ej.series) || 3); s++) {
         const peso = valor(`${idEj}-s${s}-peso`);
@@ -782,10 +2544,12 @@ function generarResumen(indice) {
       const prefijo = ej.grupo ? `${ej.grupo} ` : '';
       texto += `\n• ${prefijo}${ej.nombre}: ${series.length ? series.join(', ') : 'sin datos'}`;
       if (rir) texto += ` · RIR ${rir}`;
+      const anotado = lineasAnotadas(ej.anotar, idEj);
+      if (anotado) texto += anotado.replace(/\n• /g, '\n   – ');
     });
   });
 
-  const nota = valor(`d${indice}-nota`);
+  const nota = valor(`${base}-nota`);
   if (nota) texto += `\n\nNotas: ${nota}`;
 
   document.getElementById('resumen').innerHTML = `
@@ -806,16 +2570,76 @@ function generarResumen(indice) {
   };
 }
 
-// Arranque: completar la cabecera, crear las pestañas y mostrar el Día 1
-document.getElementById('cliente').textContent = RUTINA.cliente;
-document.getElementById('etapa-subtitulo').textContent = RUTINA.fechas;
-document.getElementById('etapa-nombre').textContent = RUTINA.etapa;
+/* ---------------------------------------------------------
+   VISTA BIBLIOTECA (para el entrenador): se abre con #biblioteca al final del link.
+   Muestra cada ejercicio con sus características y en qué días se usa.
+   --------------------------------------------------------- */
+function usosDe(id) {
+  const usos = [];
+  RUTINAS.forEach(r => r.dias.forEach(d => d.bloques.forEach(b => b.ejercicios.forEach(p => {
+    if (p.id === id) usos.push(`${r.etapa.split(' · ')[0]} · ${d.nombre.split(' · ')[0]}`);
+  }))));
+  return [...new Set(usos)];
+}
 
-document.getElementById('tabs').innerHTML = RUTINA.dias
-  .map((d, i) => `<button class="tab" onclick="mostrarDia(${i})">${d.nombre.split(' · ')[0]}</button>`)
-  .join('');
+function mostrarBiblioteca() {
+  const filtro = (document.getElementById('filtro-biblio') || {}).value || '';
+  const ids = Object.keys(BIBLIOTECA);
+  const categorias = [...new Set(ids.map(id => BIBLIOTECA[id].categoria))];
+  const pasa = (id, f) => {
+    const e = BIBLIOTECA[id];
+    return !f || [id, e.nombre, e.familia, e.categoria, e.musculos, ...e.patron, ...e.material, ...e.precauciones.etiquetas]
+      .join(' ').toLowerCase().includes(f.toLowerCase());
+  };
+  let html = `<h3 class="titulo-dia">Biblioteca · ${ids.length} ejercicios</h3>
+    <p class="detalle">Buscá por nombre, patrón, material, músculo o precaución (ej: "bisagra", "lumbar", "mancuernas").</p>
+    <input id="filtro-biblio" placeholder="Buscar…" value="${filtro}" oninput="mostrarBiblioteca()">`;
+  categorias.forEach(cat => {
+    const lista = ids.filter(id => BIBLIOTECA[id].categoria === cat && pasa(id, filtro));
+    if (!lista.length) return;
+    html += `<h2>${cat} · ${lista.length}</h2>`;
+    lista.forEach(id => {
+      const e = BIBLIOTECA[id];
+      const chips = [...e.patron.map(p => '↗ ' + p), ...e.material.map(m => '⚙ ' + m), ...e.precauciones.etiquetas.map(p => '⚠ ' + p)];
+      html += `<div class="tarjeta">
+        <h3>${e.nombre}${e.revisar ? '<span class="etiqueta nuevo">REVISAR</span>' : ''}</h3>
+        <p class="detalle"><code>${id}</code>${e.familia ? ' · familia: <b>' + e.familia + '</b>' : ''}</p>
+        <p class="detalle">${e.musculos}</p>
+        ${chips.length ? `<div class="resumen" style="margin:8px 0 0">${chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>` : ''}
+        ${e.precauciones.nota ? `<p class="detalle">⚠ ${e.precauciones.nota}</p>` : ''}
+        <p class="detalle">Se usa en: ${usosDe(id).join(', ') || '—'}</p>
+        ${bloqueDescripcion(e, 'Para qué:')}
+      </div>`;
+    });
+  });
+  document.getElementById('contenido').innerHTML = html;
+  const campo = document.getElementById('filtro-biblio');
+  campo.focus(); campo.setSelectionRange(filtro.length, filtro.length);
+}
 
-mostrarDia(0);
+// Cambiar de etapa: actualiza la cabecera y las pestañas y abre el primer día
+function elegirEtapa(id) {
+  RUTINA = RUTINAS.find(r => r.id === id) || RUTINAS[0];
+  document.getElementById('etapa-subtitulo').textContent = RUTINA.fechas;
+  document.getElementById('selector-etapa').value = RUTINA.id;
+  document.getElementById('tabs').innerHTML = RUTINA.dias
+    .map((d, i) => `<button class="tab" onclick="mostrarDia(${i})">${d.nombre.split(' · ')[0]}</button>`)
+    .join('');
+  mostrarDia(0);
+}
+
+// Arranque: nombre del cliente, opciones del selector y la etapa actual
+document.getElementById('cliente').textContent = CLIENTE;
+document.getElementById('selector-etapa').innerHTML = RUTINAS
+  .map(r => `<option value="${r.id}">${r.etapa}</option>`).join('');
+if (location.hash === '#biblioteca') {
+  document.getElementById('etapa-subtitulo').textContent = 'Vista del entrenador';
+  document.getElementById('cliente').textContent = 'Biblioteca de ejercicios';
+  document.getElementById('selector-etapa').hidden = true;
+  mostrarBiblioteca();
+} else {
+  elegirEtapa(RUTINAS[0].id);
+}
 </script>
 </body>
 </html>
