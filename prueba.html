@@ -133,6 +133,16 @@
   .felicitacion h3 { font-size: 22px; margin: 6px 0 12px; }
   .centrado-flex { justify-content: center; }
   .login input { margin-top: 10px; }
+  .res-ejercicio { padding: 10px 0; border-bottom: 1px solid var(--borde); }
+  .res-ejercicio:last-of-type { border-bottom: 0; }
+  .res-nombre { font-weight: 600; font-size: 15px; }
+  .res-grupo { font-size: 11px; background: var(--grupo); color: white; border-radius: 6px; padding: 1px 6px; margin-right: 6px; vertical-align: middle; }
+  .res-series { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .pastilla { background: var(--acento-claro); color: var(--acento); border-radius: 999px; padding: 4px 10px; font-size: 14px; font-weight: 600; }
+  .pastilla.rir { background: #fff3d6; color: #8a5a00; }
+  .res-vacio { color: var(--suave); font-size: 14px; }
+  .res-anotado { color: var(--suave); font-size: 14px; margin-top: 4px; }
+  .res-nota { background: var(--fondo); border-radius: 10px; padding: 10px; margin-top: 10px; font-size: 15px; white-space: pre-wrap; }
   input.copiado { color: var(--suave); font-style: italic; } /* se llenó solo con la serie anterior */
   pre.resumen-texto { white-space: pre-wrap; font-size: 13px; background: var(--fondo); padding: 10px; border-radius: 8px; }
 </style>
@@ -2972,6 +2982,7 @@ function terminarSesion(indice) {
   const base = claveDia(indice);
   const pasos = pasosDelDia(indice);
   const texto = generarResumen(indice);
+  const tarjetaResumen = resumenVisual(indice);
   const hechos = Object.keys(sesion.hechos).length;
   const minutos = minutosDesde(sesion.inicio);
   const series = pasos.filter(p => p.bloque.principal)
@@ -2998,19 +3009,52 @@ function terminarSesion(indice) {
       <p class="detalle">${usuario ? 'Tus registros se guardan solos (si no hay internet, apenas vuelva).' : 'Mandale el resumen a tu entrenador.'}</p>
     </div>
     <div class="tarjeta">
-      <div class="registro-titulo">Resumen (respaldo por WhatsApp)</div>
-      <pre class="resumen-texto" id="resumen-texto"></pre>
+      <div class="registro-titulo">Tu sesión</div>
+      ${tarjetaResumen}
       <button class="boton secundario" id="boton-copiar">Copiar para enviar por WhatsApp</button>
     </div>
     <button class="boton" onclick="mostrarDia(${indice})">Volver al día</button>`;
-  // textContent (y no innerHTML) para que lo que escribe Rodrigo se muestre tal cual, sin interpretarse como código
-  document.getElementById('resumen-texto').textContent = texto;
   document.getElementById('boton-copiar').onclick = async () => {
     const boton = document.getElementById('boton-copiar');
     try { await navigator.clipboard.writeText(texto); boton.textContent = '✓ Copiado'; }
     catch (e) { boton.textContent = 'No se pudo copiar: mantené apretado el texto de arriba'; }
   };
   window.scrollTo(0, 0);
+}
+
+/* ---------------------------------------------------------
+   RESUMEN VISUAL (lo que ve Rodrigo al terminar): cada ejercicio
+   con sus series como "pastillas". Lee del borrador.
+   --------------------------------------------------------- */
+// Lo que escribe Rodrigo se "escapa" antes de mostrarlo: si escribiera algo con < o >,
+// se ve como texto y nunca se ejecuta como código.
+const escapar = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function resumenVisual(indice) {
+  const base = claveDia(indice);
+  let html = '';
+  pasosDelDia(indice).forEach(({ ej, bloque, idEj }) => {
+    const anotados = (ej.anotar || []).map((c, k) => [c.etiqueta, valor(`${idEj}-a${k}`)]).filter(([, v]) => v);
+    if (!bloque.principal && !anotados.length) return;
+    let series = [];
+    if (bloque.principal) {
+      for (let s = 1; s <= (parseInt(ej.series) || 3); s++) {
+        const kg = valor(`${idEj}-s${s}-peso`), reps = valor(`${idEj}-s${s}-reps`);
+        const rirS = ej.rirPorSerie ? valor(`${idEj}-s${s}-rir`) : '';
+        if (kg || reps) series.push(`${kg ? escapar(kg) + ' kg' : '—'} × ${reps ? escapar(reps) : '?'}${rirS ? ` · RIR ${escapar(rirS)}` : ''}`);
+      }
+    }
+    const rir = valor(`${idEj}-rir`);
+    html += `
+      <div class="res-ejercicio">
+        <div class="res-nombre">${ej.grupo ? `<span class="res-grupo">${ej.grupo}</span>` : ''}${ej.nombre}</div>
+        ${bloque.principal ? `<div class="res-series">${series.length ? series.map(x => `<span class="pastilla">${x}</span>`).join('') : '<span class="res-vacio">Sin anotar</span>'}${rir ? `<span class="pastilla rir">RIR ${escapar(rir)}</span>` : ''}</div>` : ''}
+        ${anotados.map(([e, v]) => `<div class="res-anotado">${e}: <b>${escapar(v)}</b></div>`).join('')}
+      </div>`;
+  });
+  const nota = valor(`${base}-nota`);
+  if (nota) html += `<div class="res-nota">💬 ${escapar(nota)}</div>`;
+  return html || '<p class="detalle">No anotaste series en esta sesión.</p>';
 }
 
 /* ---------------------------------------------------------
