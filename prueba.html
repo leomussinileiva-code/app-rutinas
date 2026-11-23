@@ -143,6 +143,7 @@
   .res-vacio { color: var(--suave); font-size: 14px; }
   .res-anotado { color: var(--suave); font-size: 14px; margin-top: 4px; }
   .res-nota { background: var(--fondo); border-radius: 10px; padding: 10px; margin-top: 10px; font-size: 15px; white-space: pre-wrap; }
+  .version { text-align: center; font-size: 11px; color: var(--suave); padding: 12px 0 20px; }
   input.copiado { color: var(--suave); font-style: italic; } /* se llenó solo con la serie anterior */
   pre.resumen-texto { white-space: pre-wrap; font-size: 13px; background: var(--fondo); padding: 10px; border-radius: 8px; }
 </style>
@@ -160,6 +161,8 @@
 </header>
 <nav class="tabs" id="tabs"></nav>
 <main id="contenido"></main>
+<!-- Número de versión: cambia en cada subida. Sirve para saber si el navegador muestra la última (caché). -->
+<footer class="version">v. 24/11 · 00:46</footer>
 
 <script>
 /* =========================================================
