@@ -134,6 +134,7 @@
   .felicitacion h3 { font-size: 22px; margin: 6px 0 12px; }
   .centrado-flex { justify-content: center; }
   .login input { margin-top: 10px; }
+  input.copiado { color: var(--suave); font-style: italic; } /* se llenó solo con la serie anterior */
   pre.resumen-texto { white-space: pre-wrap; font-size: 13px; background: var(--fondo); padding: 10px; border-radius: 8px; }
 </style>
 </head>
@@ -2702,18 +2703,45 @@ const HORAS_SESION_VIEJA = 6;
 function valor(id) { return (borrador[id] || '').toString().trim(); }
 
 // Cada vez que escribe algo: lo guardamos en el borrador y, si hay sesión, en la base.
+// COPIADOS: campos que se llenaron solos al copiar la serie anterior (se ven en otro tono).
+let copiados = leerLocal('campos-copiados', {});
+
 document.addEventListener('input', e => {
   const id = e.target.dataset.id;
   if (!id) return;
   if (e.target.value) borrador[id] = e.target.value; else delete borrador[id];
+  delete copiados[id];              // lo escribió a mano: ya no es "copiado"
+  e.target.classList.remove('copiado');
+  copiarALasSiguientes(id, e.target.value);
   guardarLocal('registro-rutina', borrador);
+  guardarLocal('campos-copiados', copiados);
   if (pantalla.tipo === 'paso') encolarEjercicioActual();
   if (pantalla.tipo === 'dia' && id.includes('-antes-')) encolarAntes(pantalla.indice);
 });
 
+// LA SERIE SIGUIENTE COPIA LA ANTERIOR: si en la serie 1 pone 65 kg, las series 2, 3 y 4
+// se llenan con 65. Solo toca las que están vacías o que se habían llenado solas:
+// lo que Rodrigo escribió a mano nunca se pisa. Vale para kg y reps (el RIR no se copia).
+function copiarALasSiguientes(id, texto) {
+  const m = id.match(/^(.*)-s(\d+)-(peso|reps)$/);
+  if (!m || pantalla.tipo !== 'paso') return;
+  const [, idEj, n, campo] = m;
+  const { ej } = pasosDelDia(pantalla.indice)[pantalla.paso];
+  const total = parseInt(ej.series) || 3;
+  for (let s = parseInt(n) + 1; s <= total; s++) {
+    const otro = `${idEj}-s${s}-${campo}`;
+    if (valor(otro) && !copiados[otro]) break;   // escrito a mano: de acá en adelante no se toca
+    if (texto) { borrador[otro] = texto; copiados[otro] = true; }
+    else { delete borrador[otro]; delete copiados[otro]; }
+    const input = document.querySelector(`[data-id="${otro}"]`);
+    if (input) { input.value = texto; input.classList.toggle('copiado', !!texto); }
+  }
+}
+
 function restaurarBorrador() {
   document.querySelectorAll('[data-id]').forEach(campo => {
     if (borrador[campo.dataset.id]) campo.value = borrador[campo.dataset.id];
+    campo.classList.toggle('copiado', !!copiados[campo.dataset.id]);
   });
 }
 
@@ -2755,7 +2783,9 @@ function limpiarSesionesViejas() {
 
 function borrarBorradorDelDia(clave) {
   Object.keys(borrador).forEach(id => { if (id.startsWith(clave + '-')) delete borrador[id]; });
+  Object.keys(copiados).forEach(id => { if (id.startsWith(clave + '-')) delete copiados[id]; });
   guardarLocal('registro-rutina', borrador);
+  guardarLocal('campos-copiados', copiados);
 }
 
 // ---------- Qué hay en pantalla ----------
