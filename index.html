@@ -1504,6 +1504,99 @@ const BIBLIOTECA = {
       ]
     },
     revisar: true
+  },
+  /* --- Nuevos con el martes de la Etapa 6 (24/11/2026) --- */
+  "pull-apart-banda": {
+    nombre: "Pull-aparts con banda",
+    categoria: "activación",
+    patron: ["tracción horizontal"],
+    musculos: "Deltoides posterior, romboides, trapecio medio",
+    material: ["banda"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Activar la parte de atrás del hombro y las escápulas antes de empujar.",
+      pasos: [
+        "Banda frente al pecho, brazos estirados, agarre al ancho de hombros.",
+        "Abrí los brazos hasta que la banda toque el pecho, juntando las escápulas.",
+        "Volvé controlando, sin dejar que la banda te tire."
+      ]
+    },
+    revisar: true
+  },
+  "dislocaciones-banda": {
+    nombre: "Dislocaciones con banda",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Hombro",
+    material: ["banda"],
+    precauciones: { etiquetas: ["hombro"], nota: "Si duele, abrir más el agarre." },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar el hombro en todo su recorrido.",
+      pasos: [
+        "Banda con agarre ancho, brazos estirados adelante.",
+        "Pasá la banda por encima de la cabeza hasta atrás, sin doblar los codos.",
+        "Volvé por el mismo camino (ida y vuelta = 1). Si duele, abrí más las manos."
+      ]
+    },
+    revisar: true
+  },
+  "press-frances-barra-ez": {
+    nombre: "Press francés con barra EZ",
+    familia: "extension-triceps",
+    categoria: "fuerza",
+    patron: ["extensión de codo"],
+    musculos: "Tríceps",
+    material: ["barra EZ", "banco"],
+    precauciones: { etiquetas: ["codo"], nota: "No al fallo (cuidar el codo)." },
+    videos: [],
+    descripcion: {
+      musculos: "Tríceps, sobre todo la porción larga.",
+      pasos: [
+        "Acostado en banco plano, barra EZ arriba del pecho con los brazos estirados.",
+        "Codos quietos apuntando al techo: flexioná solo los codos y bajá la barra hacia la frente.",
+        "Estirá los codos hasta volver arriba, sin mover los brazos."
+      ]
+    },
+    revisar: true
+  },
+  "triceps-polea": {
+    nombre: "Tríceps en polea",
+    familia: "extension-triceps",
+    categoria: "fuerza",
+    patron: ["extensión de codo"],
+    musculos: "Tríceps",
+    material: ["polea"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Tríceps.",
+      pasos: [
+        "De frente a la polea alta, agarrá la barra o la cuerda.",
+        "Codos pegados al cuerpo: no se mueven en todo el ejercicio.",
+        "Extendé los codos del todo hacia abajo y volvé controlado hasta unos 90°."
+      ]
+    },
+    revisar: true
+  },
+  "estiramiento-hombro-anterior-banco": {
+    nombre: "Hombro anterior de espaldas a un banco",
+    categoria: "estiramiento",
+    patron: [],
+    musculos: "Hombro anterior, pecho",
+    material: ["banco"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Estirar la parte delantera del hombro.",
+      pasos: [
+        "De espaldas a un banco, apoyá las manos atrás en el borde, dedos hacia adelante.",
+        "Bajá despacio flexionando las piernas hasta sentir tensión adelante del hombro.",
+        "Sin forzar: tiene que tirar, no doler."
+      ]
+    },
+    revisar: true
   }
 };
 
@@ -1652,6 +1745,135 @@ const ETAPA6 = {
             { id: "estiramiento-figure-four", dosis: "30 s por lado", nota: "Lo sentís en el glúteo." },
             { id: "estiramiento-mariposa", dosis: "30 s", nota: "Lo sentís en los aductores (cara interna del muslo)." },
             { id: "estiramiento-gemelo-pared", dosis: "30 s por pierna", nota: "Rodilla estirada y después flexionada. Lo sentís en la pantorrilla." }
+          ]
+        }
+      ]
+    },
+    {
+      nombre: "Martes · Pecho y tríceps",
+      objetivo: "Fuerza en banca + hipertrofia.",
+      duracion: "~80 min",
+      reglas: [
+        "RIR: al terminar cada serie preguntate ¿cuántas más me salían con buena técnica? Ese número es el RIR. RIR 3 = te sobraban 3. RIR 2 = las últimas 2 reps tienen que costarte de verdad.",
+        "Anotá siempre la carga y las reps de cada serie.",
+        "Si aparece dolor en una articulación (no cansancio muscular), parás el ejercicio, lo anotás y lo revisamos."
+      ],
+      bloques: [
+        {
+          nombre: "1 · Entrada en calor",
+          nota: "≈ 15 min · 1 serie de cada uno, sin apuro.",
+          ejercicios: [
+            { id: "remo-ergometro", dosis: "5 min suave", nota: "Ritmo en el que puedas hablar. Es para entrar en calor, no para cansarte." },
+            { id: "gato-vaca", dosis: "5 ciclos", nota: "En cuadrupedia, redondeá y arqueá la espalda despacio. Sin forzar el final del movimiento (cuidá la lumbar)." },
+            { id: "pull-apart-banda", dosis: "× 12", nota: "Banda frente al pecho, brazos estirados: abrí hasta tocar el pecho juntando las escápulas. Volvé controlando." },
+            { id: "dislocaciones-banda", dosis: "× 10", nota: "Brazos estirados, pasá la banda por encima de la cabeza hacia atrás y volvé (ida y vuelta = 1). Agarre ancho; si duele, abrí más las manos." },
+            {
+              id: "movilidad-hombro-banda",
+              nombre: "Hombro con banda en el poste",
+              dosis: "× 8 por dirección y brazo",
+              nota: "Banda a la altura de la cadera, alejate hasta que quede tensa, brazo estirado. 4 direcciones: mirando al poste (brazo hacia atrás), de espaldas (brazo hacia adelante y arriba), de costado alejando el brazo y de costado acercándolo."
+            }
+          ]
+        },
+        {
+          nombre: "2 · Bloque principal",
+          nota: "≈ 55 min.",
+          principal: true,
+          ejercicios: [
+            {
+              id: "press-banca-barra",
+              destacado: true,
+              series: "4",
+              reps: "6",
+              carga: "60 kg",
+              rir: "3",
+              descanso: "2-3 min",
+              previo: "Aproximaciones (rápidas, con técnica perfecta y descanso corto): barra × 10, 40 kg × 5, 50 kg × 3. <br><b>Después de la 1.ª serie</b> (¿cuántas más me salían?): 4 o más → subí a 65 kg · 2-3 → seguí con 60 kg · 1 o ninguna → bajá a 55 kg.",
+              indicaciones: [
+                "Escápulas juntas y abajo contra el banco, pies firmes.",
+                "El arco sale de la parte alta de la espalda, no de la lumbar.",
+                "Barra al pecho controlada, sin rebote. Nunca al fallo."
+              ],
+              anotar: [{ etiqueta: "Después de la 1.ª serie: ¿subiste, mantuviste o bajaste?", placeholder: "65 / 60 / 55 kg" }]
+            },
+            {
+              id: "press-inclinado-mancuernas",
+              series: "4",
+              reps: "8",
+              carga: "20 kg c/u",
+              rir: "3",
+              descanso: "90 s",
+              indicaciones: [
+                "Banco a unos 30°.",
+                "Bajá hasta sentir el pecho estirado y empujá juntando las mancuernas arriba.",
+                "Si completás 4 × 8 cómodo, la próxima semana subís de peso."
+              ]
+            },
+            {
+              id: "paralelas",
+              series: "3",
+              reps: "6",
+              carga: "Peso corporal",
+              rir: "≈ 0-1",
+              descanso: "90 s",
+              previo: "En kg poné 0. Si en la última serie no llegás a 6, está bien: anotá las reps reales (ej.: 6 · 6 · 5), sin hacer reps feas.",
+              indicaciones: [
+                "Bajá hasta que el brazo quede paralelo al suelo, no más.",
+                "Tronco algo inclinado hacia adelante.",
+                "Progresión: 3×6 → 3×7 → … → 3×10, y después se agrega peso."
+              ]
+            },
+            {
+              id: "aperturas-mancuernas",
+              series: "3",
+              reps: "15",
+              carga: "12,5 kg c/u",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: [
+                "Codos apenas flexionados y fijos.",
+                "Abajo controlá y no rebotes: ahí el hombro está más expuesto.",
+                "Si te salen 15 con margen, subí de peso en la siguiente serie."
+              ]
+            },
+            {
+              id: "press-frances-barra-ez",
+              grupo: "A1",
+              series: "3",
+              reps: "8",
+              carga: "≈ 20 kg",
+              rir: "2",
+              descanso: "—",
+              previo: "Superserie: hacés A1 y pasás directo a A2, sin descanso; descansás después de A2. Las cargas son de arranque: si al terminar sentís que te salían 3 o más, subí en la siguiente vuelta. Anotá las reps de cada ejercicio por separado.",
+              indicaciones: [
+                "Codos quietos apuntando al techo, la barra baja hacia la frente.",
+                "No al fallo (cuidamos el codo)."
+              ]
+            },
+            {
+              id: "triceps-polea",
+              grupo: "A2",
+              series: "3",
+              reps: "15",
+              carga: "≈ 30 kg",
+              rir: "2",
+              descanso: "90 s al terminar el par",
+              indicaciones: [
+                "Va justo después del press francés, sin pausa.",
+                "Codos pegados al cuerpo, extendé del todo abajo."
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "3 · Estiramientos",
+          nota: "≈ 5 min · 30 s cada uno, respirando lento.",
+          ejercicios: [
+            { id: "estiramiento-pectoral-pared", nombre: "Pectoral en marco de puerta · brazo a 90°", dosis: "30 s", nota: "Brazo a la altura del hombro, girá el cuerpo hacia afuera." },
+            { id: "estiramiento-pectoral-pared", nombre: "Pectoral en marco de puerta · brazo alto", dosis: "30 s", nota: "Igual, con el brazo más arriba de la cabeza (parte alta del pecho)." },
+            { id: "estiramiento-hombro-anterior-banco", dosis: "30 s", nota: "Manos apoyadas atrás, bajá despacio." },
+            { id: "estiramiento-triceps", dosis: "30 s por brazo", nota: "Codo flexionado, la otra mano lo lleva hacia atrás." },
+            { id: "estiramiento-postura-nino", dosis: "30 s", nota: "Brazos estirados: cadera a los talones, manos lejos, aflojá la espalda." }
           ]
         }
       ]
