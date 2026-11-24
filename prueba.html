@@ -144,6 +144,17 @@
   .res-anotado { color: var(--suave); font-size: 14px; margin-top: 4px; }
   .res-nota { background: var(--fondo); border-radius: 10px; padding: 10px; margin-top: 10px; font-size: 15px; white-space: pre-wrap; }
   .version { text-align: center; font-size: 11px; color: var(--suave); padding: 12px 0 20px; }
+  /* ---- Miércoles de carrera (25/11/2026) ---- */
+  .alerta { background: #fdeeec; border-color: #f2cbc5; font-size: 14px; }
+  .alerta b { display: block; color: #9b2c1f; margin-bottom: 4px; }
+  .alerta p { margin: 6px 0 0; color: var(--suave); }
+  .info b { display: block; margin-bottom: 4px; }
+  .info ul { margin: 0; padding-left: 18px; font-size: 14px; }
+  .fila-anotar.con-opciones { grid-template-columns: 1fr; }
+  .opciones { display: flex; flex-wrap: wrap; gap: 6px; }
+  .opcion { border: 1px solid var(--borde); background: var(--fondo); color: var(--texto); border-radius: 999px;
+    padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .opcion.elegida { background: var(--acento); border-color: var(--acento); color: white; }
   input.copiado { color: var(--suave); font-style: italic; } /* se llenó solo con la serie anterior */
   pre.resumen-texto { white-space: pre-wrap; font-size: 13px; background: var(--fondo); padding: 10px; border-radius: 8px; }
 </style>
@@ -162,7 +173,7 @@
 <nav class="tabs" id="tabs"></nav>
 <main id="contenido"></main>
 <!-- Número de versión: cambia en cada subida. Sirve para saber si el navegador muestra la última (caché). -->
-<footer class="version">v. 24/11 · 00:46</footer>
+<footer class="version">v. 25/11 · 00:30</footer>
 
 <script>
 /* =========================================================
@@ -1645,6 +1656,262 @@ const BIBLIOTECA = {
       ]
     },
     revisar: true
+  },
+  /* --- Nuevos con el miércoles de la Etapa 6 (25/11/2026): carrera y ABC de carrera --- */
+  "caminata": {
+    nombre: "Caminata a paso vivo",
+    categoria: "cardio",
+    patron: ["locomoción"],
+    musculos: "Todo el cuerpo (entrada en calor)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Subir la temperatura del cuerpo de a poco antes de trotar.",
+      pasos: [
+        "Caminá a paso vivo: más rápido que un paseo, sin llegar a trotar.",
+        "Brazos sueltos acompañando el paso."
+      ]
+    },
+    revisar: true
+  },
+  "trote-suave": {
+    nombre: "Trote suave",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Corazón y piernas",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Terminar de entrar en calor con el mismo gesto de correr.",
+      pasos: [
+        "Trote muy suave: tenés que poder hablar tranquilo.",
+        "Pasos cortos y relajados."
+      ]
+    },
+    revisar: true
+  },
+  "balanceos-pierna": {
+    nombre: "Balanceos de pierna",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera (flexores, isquiosurales, aductores y abductores)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar la cadera hacia adelante-atrás y de lado a lado antes de correr y saltar.",
+      pasos: [
+        "Apoyate con una mano en un árbol o un banco.",
+        "10 balanceos de la pierna hacia adelante y atrás.",
+        "10 balanceos de lado a lado, por delante del cuerpo.",
+        "Amplios pero sin forzar. El tronco queda quieto."
+      ]
+    },
+    revisar: true
+  },
+  "galope-frontal": {
+    nombre: "Galope frontal",
+    familia: "galope",
+    categoria: "técnica de carrera",
+    patron: ["carrera"],
+    musculos: "Pantorrillas, coordinación y ritmo",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Primer ejercicio del ABC de carrera: ritmo y rebote suave.",
+      pasos: [
+        "Saltitos hacia adelante, siempre con la misma pierna adelante.",
+        "Relajado y con ritmo. Brazos sueltos."
+      ]
+    },
+    revisar: true
+  },
+  "galope-lateral": {
+    nombre: "Galope lateral",
+    familia: "galope",
+    categoria: "técnica de carrera",
+    patron: ["desplazamiento lateral"],
+    musculos: "Pantorrillas, glúteo medio, coordinación",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Desplazarse de costado con ritmo, como en el fútbol.",
+      pasos: [
+        "De costado, los pies se juntan y se separan sin cruzarse.",
+        "Mirá hacia adelante."
+      ]
+    },
+    revisar: true
+  },
+  "taloneo": {
+    nombre: "Taloneo",
+    categoria: "técnica de carrera",
+    patron: ["carrera"],
+    musculos: "Isquiosurales, coordinación",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Trabajar la fase en que la pierna vuelve hacia atrás al correr.",
+      pasos: [
+        "Trote con pasos cortos llevando el talón hacia el glúteo.",
+        "Rápido de pies, tronco derecho."
+      ]
+    },
+    revisar: true
+  },
+  "skipping": {
+    nombre: "Skipping",
+    familia: "skipping",
+    categoria: "técnica de carrera",
+    patron: ["carrera"],
+    musculos: "Flexores de cadera, pantorrillas, coordinación",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Subir la rodilla y apoyar con la parte de adelante del pie: la base de una buena zancada.",
+      pasos: [
+        "Rodillas hacia arriba con pasos cortos y rápidos.",
+        "Apoyás en la parte de adelante del pie.",
+        "Brazos acompañando."
+      ]
+    },
+    revisar: true
+  },
+  "skipping-lateral": {
+    nombre: "Skipping lateral",
+    familia: "skipping",
+    categoria: "técnica de carrera",
+    patron: ["desplazamiento lateral"],
+    musculos: "Flexores de cadera, pantorrillas, glúteo medio",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "El skipping, pero desplazándote de costado.",
+      pasos: [
+        "Igual que el skipping (rodillas arriba, pasos cortos y rápidos, apoyo en la parte de adelante del pie).",
+        "Te desplazás de costado."
+      ]
+    },
+    revisar: true
+  },
+  "skipping-impulso": {
+    nombre: "Skipping con impulso",
+    familia: "skipping",
+    categoria: "pliometría",
+    patron: ["salto", "carrera"],
+    musculos: "Pantorrillas, glúteos, flexores de cadera",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["tobillo", "rodilla"], nota: "Caída suave. Si hace ruido al caer, impulso más chico." },
+    videos: [],
+    descripcion: {
+      musculos: "Agregarle potencia hacia arriba al skipping.",
+      pasos: [
+        "Como el skipping, pero en cada paso te impulsás hacia arriba con fuerza.",
+        "Rodilla arriba y el brazo contrario arriba.",
+        "Caída suave."
+      ]
+    },
+    revisar: true
+  },
+  "salto-patinador": {
+    nombre: "Salto de patinador con pausa",
+    familia: "saltos",
+    categoria: "pliometría",
+    patron: ["salto", "aterrizaje", "desplazamiento lateral"],
+    musculos: "Glúteo medio, cuádriceps, tobillo (estabilidad)",
+    material: ["peso corporal"],
+    precauciones: {
+      etiquetas: ["tobillo", "rodilla"],
+      nota: "Caer en una pierna yendo de costado es el gesto en el que se tuerce el tobillo: primero se aprende a frenar la caída."
+    },
+    videos: [],
+    descripcion: {
+      musculos: "Aprender a frenar una caída de costado sobre una pierna, el gesto del fútbol en el que más se tuerce el tobillo.",
+      pasos: [
+        "Saltás de costado de una pierna a la otra, como un patinador de hielo.",
+        "Caés en una sola pierna, con la otra cruzando por detrás.",
+        "Al caer te quedás quieto 2 segundos antes del siguiente salto."
+      ],
+      secciones: [
+        { titulo: "Cómo tenés que caer", texto: "Rodilla apuntando hacia el pie (que no se vaya para adentro) y tobillo firme. Caída suave y silenciosa." },
+        { titulo: "Por qué la pausa", texto: "Primero aprendés a frenar la caída; la velocidad viene después." }
+      ]
+    },
+    revisar: true
+  },
+  "carrera-caminata": {
+    nombre: "Carrera-caminata",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Corazón y piernas (base aeróbica)",
+    material: ["peso corporal"],
+    precauciones: {
+      etiquetas: ["tibia", "tendón de Aquiles", "rodilla", "lumbar"],
+      nota: "Molestia de más de 3/10 en tibia, Aquiles, rodilla o lumbar (durante o al día siguiente), o que empeora mientras corre: avisa y no se avanza la semana siguiente."
+    },
+    videos: [],
+    descripcion: {
+      musculos: "Construir base aeróbica y acostumbrar de a poco tendones, huesos y planta del pie al impacto. De a poco vas a correr más y caminar menos.",
+      pasos: [
+        "Alternás tramos de trote suave con tramos caminando, según el formato del día.",
+        "El trote es suave: tenés que poder hablar con frases completas. Si te falta el aire para hablar, bajá el ritmo.",
+        "No importa la velocidad, importa el tiempo."
+      ],
+      secciones: [
+        { titulo: "Si pisás pesado", texto: "Si sentís que golpeás el piso, hacé los pasos un poco más cortos y más rápidos. Eso baja la carga en las rodillas y la cadera." }
+      ]
+    },
+    revisar: true
+  },
+  "piques-progresivos": {
+    nombre: "Piques progresivos",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Piernas (velocidad)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Preparar las piernas para ir rápido antes de las pasadas.",
+      pasos: [
+        "En llano. Empezás suave y vas acelerando hasta ir rápido al final.",
+        "Volvés caminando."
+      ]
+    },
+    revisar: true
+  },
+  "pasadas": {
+    nombre: "Pasadas",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Piernas (velocidad)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["rodilla", "lumbar"], nota: "En cuesta, la bajada siempre caminando: bajar corriendo golpea mucho rodillas y espalda." },
+    videos: [],
+    descripcion: {
+      musculos: "Que las piernas se acostumbren a ir rápido, como cuando tenés que picar en el fútbol, sin ir a muerte.",
+      pasos: [
+        "Elegí dos marcas fijas (un árbol, un cartel) y cronometrá cada pasada con el celular.",
+        "Intensidad 70-80 %: rápido y suelto, como si fueras a buscar una pelota. Al terminar tenés que sentir que podrías hacer otra igual.",
+        "Volvés siempre caminando y descansás hasta sentirte listo (más o menos 90 segundos)."
+      ],
+      secciones: [
+        { titulo: "Cuándo terminar", texto: "Las pasadas tienen que salir con tiempos parecidos (más o menos 1 segundo de diferencia). Si una sale claramente más lenta, o tenés que apretar mucho para mantener el tiempo, terminás ahí." },
+        { titulo: "Para medir la distancia", texto: "Caminando, 50 m son unos 65-70 pasos normales." }
+      ]
+    },
+    revisar: true
   }
 };
 
@@ -1922,6 +2189,116 @@ const ETAPA6 = {
             { id: "estiramiento-hombro-anterior-banco", dosis: "30 s", nota: "Manos apoyadas atrás, bajá despacio." },
             { id: "estiramiento-triceps", dosis: "30 s por brazo", nota: "Codo flexionado, la otra mano lo lleva hacia atrás." },
             { id: "estiramiento-postura-nino", dosis: "30 s", nota: "Brazos estirados: cadera a los talones, manos lejos, aflojá la espalda." }
+          ]
+        }
+      ]
+    },
+    {
+      nombre: "Miércoles · Carrera + pliometría",
+      objetivo: "Volver a correr de a poco y construir base aeróbica: que el corazón y los músculos aprendan a trabajar mucho tiempo sin cansarse. Los pulmones se adaptan rápido, pero los tendones, huesos y la planta del pie tardan más en acostumbrarse al impacto: por eso arrancamos con carrera-caminata. Además, un ABC de carrera que te prepara para correr mejor y unas pasadas cortas para que las piernas se acostumbren a ir rápido (te protege para cuando tengas que picar en el fútbol).",
+      alerta: {
+        titulo: "Regla de las molestias · la más importante de la sesión",
+        texto: "Si mientras corrés o al día siguiente aparece una molestia de más de 3 sobre 10 en la tibia, el tendón de Aquiles (atrás del tobillo), la rodilla o la zona lumbar, o una molestia que empeora mientras corrés: avisame y la semana siguiente no avanzamos.",
+        nota: "Que te duelan los gemelos los primeros días es normal y no cuenta."
+      },
+      info: [
+        {
+          titulo: "📍 Dónde y qué llevar",
+          items: [
+            "En la rambla. Para el ABC y las pasadas buscá pasto: amortigua mucho más que el pavimento.",
+            "Llevá el reloj o el celular: todo se mide por tiempo, no por velocidad. Si tu reloj tiene GPS o mide pulsaciones, dejalo grabando aunque no lo mires: nos sirve para planificar enero.",
+            "Zapatillas con buena amortiguación."
+          ]
+        }
+      ],
+      reglas: [
+        "Todo se mide por tiempo, no por velocidad.",
+        "Si llegás con las piernas pesadas, las pasadas son lo primero que se saca."
+      ],
+      bloques: [
+        {
+          nombre: "1 · Entrada en calor",
+          ejercicios: [
+            { id: "caminata", dosis: "5-10 min", nota: "Hasta la rambla, a paso vivo." },
+            { id: "trote-suave", dosis: "3 min", nota: "Muy suave, que puedas hablar tranquilo." },
+            { id: "movilidad-articular-general", dosis: "~3 min", nota: "Círculos de tobillos, rodillas, cadera y hombros, en los dos sentidos." },
+            { id: "worlds-greatest-stretch", dosis: "5 por lado" },
+            { id: "balanceos-pierna", nuevo: true, dosis: "10 + 10 por pierna" },
+            { id: "movilidad-tobillo-media-rodilla", dosis: "10 por lado", nota: "La rodilla de adelante va hacia adelante, por encima de los dedos, sin despegar el talón. 1 segundo adelante y volvés." },
+            { id: "puente-gluteos", dosis: "2 × 12", nota: "En el pasto. 2 segundos arriba y bajás lento. El que empuja es el glúteo, sin arquear la zona lumbar." },
+            { id: "plancha-frontal-lateral", dosis: "1 serie: 30 s frontal + 20-30 s lateral por lado", nota: "Cuerpo en línea recta, que la cadera no se caiga. En la lateral, empujá el piso con el codo." },
+            { id: "elevaciones-talon", dosis: "1 × 15", nota: "1 segundo arriba y bajás lento. Prepara el gemelo y el tendón de Aquiles antes de los saltos." }
+          ]
+        },
+        {
+          nombre: "2 · ABC de carrera + saltos",
+          nota: "En el pasto. Cada ejercicio: 10 m de ida y volvés caminando. Van de más suave a más intenso: respetá el orden. Al principio te van a salir medio desordenados, es normal.",
+          reglas: [
+            "En todos los saltos: caída suave y silenciosa. Si hacés ruido al caer, saltá más bajito."
+          ],
+          ejercicios: [
+            { id: "galope-frontal", nuevo: true, dosis: "1 × 10 m" },
+            { id: "galope-lateral", nuevo: true, dosis: "1 × 10 m por lado" },
+            { id: "taloneo", nuevo: true, dosis: "1 × 10 m" },
+            { id: "skipping", nuevo: true, dosis: "3 × 10 m", nota: "1.ª pasada bajo (rodilla poco), 2.ª medio, 3.ª alto (muslo casi paralelo al piso)." },
+            { id: "skipping-lateral", nuevo: true, dosis: "1 × 10 m por lado" },
+            { id: "pogo-jumps", dosis: "2 × 10", nota: "Solo tobillos, rodillas casi rectas. Tocás el piso y rebotás rápido. Saltos chicos." },
+            { id: "skipping-impulso", nuevo: true, dosis: "2 × 10 m" },
+            { id: "salto-patinador", nuevo: true, dosis: "3 por lado · 2 s quieto en cada caída" }
+          ],
+          cierre: {
+            titulo: "🎥 Video",
+            texto: "Mandame un video del salto de patinador, de frente, en esta primera sesión."
+          }
+        },
+        {
+          nombre: "3 · Carrera-caminata",
+          nota: "Por la rambla. Acordate de la regla de las molestias.",
+          ejercicios: [
+            {
+              id: "carrera-caminata",
+              dosis: "5 × (3 min trotando + 1 min caminando) · 15 min corriendo en total",
+              anotar: [
+                { etiqueta: "¿Completaste el formato?", opciones: ["Sí, completo", "Lo corté antes"] },
+                { etiqueta: "Si lo cortaste: ¿hasta dónde llegaste?", placeholder: "ej.: 3 de 5" },
+                { etiqueta: "Ritmo (si el reloj lo da)", placeholder: "min/km" },
+                { etiqueta: "Pulsaciones (si el reloj las da)", placeholder: "media / máx." }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "4 · Piques",
+          ejercicios: [
+            { id: "piques-progresivos", dosis: "2 × 20 m", nota: "En llano. Preparan las piernas para las pasadas, que vienen justo después." }
+          ]
+        },
+        {
+          nombre: "5 · Pasadas",
+          nota: "A · en cuesta (la preferida): subida suave de pasto, 40-50 m (10-15 s). B · en llano, si no encontrás subida: pasto en llano, 30-40 m. C · si no hay pasto ni subida: ese día no las hacés.",
+          ejercicios: [
+            {
+              id: "pasadas",
+              dosis: "5 repeticiones · 70-80 % · volvés caminando y descansás ≈ 90 s",
+              anotar: [
+                { etiqueta: "¿Dónde las hiciste?", opciones: ["A · Cuesta", "B · Llano", "C · No las hice"] },
+                { etiqueta: "Pasada 1", placeholder: "segundos" },
+                { etiqueta: "Pasada 2", placeholder: "segundos" },
+                { etiqueta: "Pasada 3", placeholder: "segundos" },
+                { etiqueta: "Pasada 4", placeholder: "segundos" },
+                { etiqueta: "Pasada 5", placeholder: "segundos" }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "6 · Estiramientos",
+          nota: "30 segundos cada uno. Después volvés caminando: esa es tu vuelta a la calma.",
+          ejercicios: [
+            { id: "estiramiento-gemelo-pared", dosis: "30 s por posición y pierna", nota: "Dos posiciones: rodilla de atrás estirada (gemelo) y flexionada (sóleo)." },
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna", nota: "Talón hacia el glúteo, rodillas juntas, abdomen firme sin arquear la espalda." },
+            { id: "estiramiento-flexor-cadera", dosis: "30 s por pierna", nota: "Rodilla de atrás apoyada, apretá el glúteo de esa pierna y llevá la cadera un poco adelante." },
+            { id: "estiramiento-isquios-sentado", dosis: "30 s por pierna", nota: "Pierna estirada, inclinate desde la cadera con la espalda larga." }
           ]
         }
       ]
@@ -2663,12 +3040,33 @@ function camposAnotar(campos, idBase) {
   return `
     <div class="registro">
       <div class="registro-titulo">📝 Anotá</div>
-      ${campos.map((c, k) => `
+      ${campos.map((c, k) => c.opciones ? `
+        <div class="fila-anotar con-opciones">
+          <span>${c.etiqueta}</span>
+          <div class="opciones">${c.opciones.map(o => `<button type="button" class="opcion" data-para="${idBase}-a${k}" data-valor="${escapar(o)}" onclick="elegirOpcion(this)">${o}</button>`).join('')}</div>
+          <input type="hidden" data-id="${idBase}-a${k}">
+        </div>` : `
         <div class="fila-anotar">
           <span>${c.etiqueta}</span>
           <input placeholder="${c.placeholder || ''}" data-id="${idBase}-a${k}">
         </div>`).join('')}
     </div>`;
+}
+
+// OPCIONES (25/11): en vez de escribir, toca un botón ("Cuesta" / "Llano"...).
+// El valor elegido va a un campo oculto y se guarda igual que lo escrito a mano.
+// Tocar otra vez la opción elegida la desmarca.
+function elegirOpcion(boton) {
+  const campo = document.querySelector(`[data-id="${boton.dataset.para}"]`);
+  campo.value = campo.value === boton.dataset.valor ? '' : boton.dataset.valor;
+  campo.dispatchEvent(new Event('input', { bubbles: true }));
+  marcarOpciones();
+}
+function marcarOpciones() {
+  document.querySelectorAll('.opcion').forEach(b => {
+    const campo = document.querySelector(`[data-id="${b.dataset.para}"]`);
+    b.classList.toggle('elegida', !!campo && campo.value === b.dataset.valor);
+  });
 }
 
 // Dibuja un ejercicio simple (calentamiento, cardio, estiramientos)
@@ -2755,6 +3153,7 @@ function restaurarBorrador() {
     if (borrador[campo.dataset.id]) campo.value = borrador[campo.dataset.id];
     campo.classList.toggle('copiado', !!copiados[campo.dataset.id]);
   });
+  marcarOpciones();
 }
 
 // ---------- Pasos del día: todos los ejercicios en fila ----------
@@ -2824,9 +3223,14 @@ function mostrarDia(indice) {
   chips.push(`📋 ${pasos.length} ejercicios`);
   html += `<div class="resumen">${chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>`;
 
-  html += `
-    <h2>Antes de empezar</h2>
-    <div class="tarjeta reglas"><ul>${reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+  html += `<h2>Antes de empezar</h2>`;
+  // Alerta (25/11): una regla que tiene que verse sí o sí, arriba de todo
+  if (dia.alerta) html += `<div class="tarjeta alerta"><b>⚠ ${dia.alerta.titulo}</b>${dia.alerta.texto}${dia.alerta.nota ? `<p>${dia.alerta.nota}</p>` : ''}</div>`;
+  // Info práctica (25/11): dónde, qué llevar...
+  (dia.info || []).forEach(i => {
+    html += `<div class="tarjeta info"><b>${i.titulo}</b><ul>${i.items.map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+  });
+  html += `<div class="tarjeta reglas"><ul>${reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
   if (dia.antes) html += `<div class="tarjeta">${camposAnotar(dia.antes, `${base}-antes`)}</div>`;
 
   // Botón principal: empezar o continuar
@@ -2863,6 +3267,12 @@ function mostrarDia(indice) {
 
 function empezarSesion(indice) {
   const dia = RUTINA.dias[indice];
+  // Sesión nueva = hoja en blanco: si quedó algo escrito de otra semana, se borra
+  // (menos lo que acaba de anotar en "Antes de empezar").
+  const base = claveDia(indice);
+  Object.keys(borrador).forEach(id => { if (id.startsWith(base + '-') && !id.startsWith(base + '-antes-')) { delete borrador[id]; delete copiados[id]; } });
+  guardarLocal('registro-rutina', borrador);
+  guardarLocal('campos-copiados', copiados);
   const sesion = {
     id: crypto.randomUUID(),          // el id lo crea el móvil: así funciona aunque no haya internet
     dia: dia.nombre,
@@ -2969,6 +3379,7 @@ function mostrarCierre(indice) {
   html += `
     <div class="tarjeta">
       <div class="registro-titulo">¿Cómo te sentiste? ¿Alguna molestia?</div>
+      ${RUTINA.dias[indice].alerta ? `<p class="detalle">⚠ ${RUTINA.dias[indice].alerta.texto}</p>` : ''}
       <textarea placeholder="Ej: buena sesión, banca cómoda, algo de carga en el hombro izquierdo…" data-id="${base}-nota"></textarea>
       <button class="boton" onclick="terminarSesion(${indice})">Terminar sesión</button>
       <button class="boton secundario" onclick="mostrarPaso(${indice}, ${pasos.length - 1})">← Volver al último ejercicio</button>
@@ -3362,6 +3773,14 @@ function diaQueToca() {
   document.getElementById('selector-etapa').innerHTML = RUTINAS
     .map(r => `<option value="${r.id}">${r.etapa}</option>`).join('');
   limpiarSesionesViejas();
+  // Una sola vez al pasar a esta versión: la página vieja nunca borraba lo anotado, así que
+  // se descarta todo lo que no sea de una sesión en curso (lo de antes ya llegó por WhatsApp).
+  if (!leerLocal('limpieza-v2', false)) {
+    const abiertas = Object.keys(sesionesAbiertas);
+    Object.keys(borrador).forEach(id => { if (!abiertas.some(c => id.startsWith(c + '-'))) delete borrador[id]; });
+    guardarLocal('registro-rutina', borrador);
+    guardarLocal('limpieza-v2', true);
+  }
   if (location.hash === '#biblioteca') {
     document.getElementById('etapa-subtitulo').textContent = 'Vista del entrenador';
     document.getElementById('cliente').textContent = 'Biblioteca de ejercicios';

@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rutina · Rodrigo</title>
+<title>PRUEBA · Rutina · Rodrigo</title>
+<!-- Librería oficial de Supabase (para iniciar sesión y guardar los registros) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
 
 <!-- =========================================================
      1) CSS: el "diseño". Colores, tamaños, espacios.
@@ -103,18 +105,75 @@
   }
   .boton.secundario { background: var(--acento-claro); color: var(--acento); }
   .aviso { font-size: 13px; color: var(--suave); margin: 8px 0 0; }
+  /* ---- Modo entrenamiento (24/11/2026) ---- */
+  .cabecera-fila { display: flex; justify-content: space-between; align-items: center; }
+  .estado { display: block; min-height: 16px; opacity: .85; font-size: 12px; }
+  .link { background: none; border: 0; color: var(--acento); font: inherit; font-size: 14px; cursor: pointer; padding: 6px 0; }
+  .link.claro { color: white; opacity: .9; }
+  .link.centrado { display: block; margin: 6px auto 0; }
+  .progreso { position: sticky; top: 0; z-index: 2; background: var(--fondo); padding: 6px 0 8px; margin-bottom: 6px; }
+  .progreso-texto { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--suave); }
+  .barra { height: 8px; background: var(--borde); border-radius: 999px; overflow: hidden; margin: 6px 0; }
+  .barra div { height: 100%; background: var(--acento); transition: width .3s; }
+  .botonera { display: grid; grid-template-columns: 64px 1fr; gap: 8px; }
+  .botonera .boton { margin-top: 6px; }
+  .boton:disabled { opacity: .4; cursor: default; }
+  .boton.ya-hecho { background: #1f4d36; }
+  .lista-ejercicios { padding: 4px 10px; }
+  .item-ejercicio { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; background: none; border: 0;
+    border-bottom: 1px solid var(--borde); padding: 10px 0; font: inherit; color: var(--texto); cursor: pointer; }
+  .item-ejercicio:last-child { border-bottom: 0; }
+  .item-ejercicio:disabled { cursor: default; color: var(--texto); }
+  .item-ejercicio small { display: block; color: var(--suave); font-size: 13px; }
+  .item-ejercicio .marca { flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--fondo); color: var(--suave);
+    display: grid; place-items: center; font-size: 13px; font-weight: 600; }
+  .item-ejercicio.hecho .marca { background: var(--acento-claro); color: var(--acento); font-size: 15px; }
+  .felicitacion { text-align: center; padding: 20px 0 10px; }
+  .felicitacion .grande { font-size: 48px; }
+  .felicitacion h3 { font-size: 22px; margin: 6px 0 12px; }
+  .centrado-flex { justify-content: center; }
+  .login input { margin-top: 10px; }
+  .res-ejercicio { padding: 10px 0; border-bottom: 1px solid var(--borde); }
+  .res-ejercicio:last-of-type { border-bottom: 0; }
+  .res-nombre { font-weight: 600; font-size: 15px; }
+  .res-grupo { font-size: 11px; background: var(--grupo); color: white; border-radius: 6px; padding: 1px 6px; margin-right: 6px; vertical-align: middle; }
+  .res-series { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .pastilla { background: var(--acento-claro); color: var(--acento); border-radius: 999px; padding: 4px 10px; font-size: 14px; font-weight: 600; }
+  .pastilla.rir { background: #fff3d6; color: #8a5a00; }
+  .res-vacio { color: var(--suave); font-size: 14px; }
+  .res-anotado { color: var(--suave); font-size: 14px; margin-top: 4px; }
+  .res-nota { background: var(--fondo); border-radius: 10px; padding: 10px; margin-top: 10px; font-size: 15px; white-space: pre-wrap; }
+  .version { text-align: center; font-size: 11px; color: var(--suave); padding: 12px 0 20px; }
+  /* ---- Miércoles de carrera (25/11/2026) ---- */
+  .alerta { background: #fdeeec; border-color: #f2cbc5; font-size: 14px; }
+  .alerta b { display: block; color: #9b2c1f; margin-bottom: 4px; }
+  .alerta p { margin: 6px 0 0; color: var(--suave); }
+  .info b { display: block; margin-bottom: 4px; }
+  .info ul { margin: 0; padding-left: 18px; font-size: 14px; }
+  .fila-anotar.con-opciones { grid-template-columns: 1fr; }
+  .opciones { display: flex; flex-wrap: wrap; gap: 6px; }
+  .opcion { border: 1px solid var(--borde); background: var(--fondo); color: var(--texto); border-radius: 999px;
+    padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .opcion.elegida { background: var(--acento); border-color: var(--acento); color: white; }
+  input.copiado { color: var(--suave); font-style: italic; } /* se llenó solo con la serie anterior */
   pre.resumen-texto { white-space: pre-wrap; font-size: 13px; background: var(--fondo); padding: 10px; border-radius: 8px; }
 </style>
 </head>
 <body>
 
 <header>
-  <small id="etapa-subtitulo"></small>
+  <div class="cabecera-fila">
+    <small id="etapa-subtitulo"></small>
+    <button id="boton-salir" class="link claro" onclick="salir()" hidden>Salir</button>
+  </div>
   <h1 id="cliente"></h1>
+  <small id="estado-guardado" class="estado"></small>
   <select id="selector-etapa" class="selector-etapa" onchange="elegirEtapa(this.value)" aria-label="Elegir etapa"></select>
 </header>
 <nav class="tabs" id="tabs"></nav>
 <main id="contenido"></main>
+<!-- Número de versión: cambia en cada subida. Sirve para saber si el navegador muestra la última (caché). -->
+<footer class="version">v. 25/11 · 00:30</footer>
 
 <script>
 /* =========================================================
@@ -1597,6 +1656,262 @@ const BIBLIOTECA = {
       ]
     },
     revisar: true
+  },
+  /* --- Nuevos con el miércoles de la Etapa 6 (25/11/2026): carrera y ABC de carrera --- */
+  "caminata": {
+    nombre: "Caminata a paso vivo",
+    categoria: "cardio",
+    patron: ["locomoción"],
+    musculos: "Todo el cuerpo (entrada en calor)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Subir la temperatura del cuerpo de a poco antes de trotar.",
+      pasos: [
+        "Caminá a paso vivo: más rápido que un paseo, sin llegar a trotar.",
+        "Brazos sueltos acompañando el paso."
+      ]
+    },
+    revisar: true
+  },
+  "trote-suave": {
+    nombre: "Trote suave",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Corazón y piernas",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Terminar de entrar en calor con el mismo gesto de correr.",
+      pasos: [
+        "Trote muy suave: tenés que poder hablar tranquilo.",
+        "Pasos cortos y relajados."
+      ]
+    },
+    revisar: true
+  },
+  "balanceos-pierna": {
+    nombre: "Balanceos de pierna",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Cadera (flexores, isquiosurales, aductores y abductores)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar la cadera hacia adelante-atrás y de lado a lado antes de correr y saltar.",
+      pasos: [
+        "Apoyate con una mano en un árbol o un banco.",
+        "10 balanceos de la pierna hacia adelante y atrás.",
+        "10 balanceos de lado a lado, por delante del cuerpo.",
+        "Amplios pero sin forzar. El tronco queda quieto."
+      ]
+    },
+    revisar: true
+  },
+  "galope-frontal": {
+    nombre: "Galope frontal",
+    familia: "galope",
+    categoria: "técnica de carrera",
+    patron: ["carrera"],
+    musculos: "Pantorrillas, coordinación y ritmo",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Primer ejercicio del ABC de carrera: ritmo y rebote suave.",
+      pasos: [
+        "Saltitos hacia adelante, siempre con la misma pierna adelante.",
+        "Relajado y con ritmo. Brazos sueltos."
+      ]
+    },
+    revisar: true
+  },
+  "galope-lateral": {
+    nombre: "Galope lateral",
+    familia: "galope",
+    categoria: "técnica de carrera",
+    patron: ["desplazamiento lateral"],
+    musculos: "Pantorrillas, glúteo medio, coordinación",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Desplazarse de costado con ritmo, como en el fútbol.",
+      pasos: [
+        "De costado, los pies se juntan y se separan sin cruzarse.",
+        "Mirá hacia adelante."
+      ]
+    },
+    revisar: true
+  },
+  "taloneo": {
+    nombre: "Taloneo",
+    categoria: "técnica de carrera",
+    patron: ["carrera"],
+    musculos: "Isquiosurales, coordinación",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Trabajar la fase en que la pierna vuelve hacia atrás al correr.",
+      pasos: [
+        "Trote con pasos cortos llevando el talón hacia el glúteo.",
+        "Rápido de pies, tronco derecho."
+      ]
+    },
+    revisar: true
+  },
+  "skipping": {
+    nombre: "Skipping",
+    familia: "skipping",
+    categoria: "técnica de carrera",
+    patron: ["carrera"],
+    musculos: "Flexores de cadera, pantorrillas, coordinación",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Subir la rodilla y apoyar con la parte de adelante del pie: la base de una buena zancada.",
+      pasos: [
+        "Rodillas hacia arriba con pasos cortos y rápidos.",
+        "Apoyás en la parte de adelante del pie.",
+        "Brazos acompañando."
+      ]
+    },
+    revisar: true
+  },
+  "skipping-lateral": {
+    nombre: "Skipping lateral",
+    familia: "skipping",
+    categoria: "técnica de carrera",
+    patron: ["desplazamiento lateral"],
+    musculos: "Flexores de cadera, pantorrillas, glúteo medio",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "El skipping, pero desplazándote de costado.",
+      pasos: [
+        "Igual que el skipping (rodillas arriba, pasos cortos y rápidos, apoyo en la parte de adelante del pie).",
+        "Te desplazás de costado."
+      ]
+    },
+    revisar: true
+  },
+  "skipping-impulso": {
+    nombre: "Skipping con impulso",
+    familia: "skipping",
+    categoria: "pliometría",
+    patron: ["salto", "carrera"],
+    musculos: "Pantorrillas, glúteos, flexores de cadera",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["tobillo", "rodilla"], nota: "Caída suave. Si hace ruido al caer, impulso más chico." },
+    videos: [],
+    descripcion: {
+      musculos: "Agregarle potencia hacia arriba al skipping.",
+      pasos: [
+        "Como el skipping, pero en cada paso te impulsás hacia arriba con fuerza.",
+        "Rodilla arriba y el brazo contrario arriba.",
+        "Caída suave."
+      ]
+    },
+    revisar: true
+  },
+  "salto-patinador": {
+    nombre: "Salto de patinador con pausa",
+    familia: "saltos",
+    categoria: "pliometría",
+    patron: ["salto", "aterrizaje", "desplazamiento lateral"],
+    musculos: "Glúteo medio, cuádriceps, tobillo (estabilidad)",
+    material: ["peso corporal"],
+    precauciones: {
+      etiquetas: ["tobillo", "rodilla"],
+      nota: "Caer en una pierna yendo de costado es el gesto en el que se tuerce el tobillo: primero se aprende a frenar la caída."
+    },
+    videos: [],
+    descripcion: {
+      musculos: "Aprender a frenar una caída de costado sobre una pierna, el gesto del fútbol en el que más se tuerce el tobillo.",
+      pasos: [
+        "Saltás de costado de una pierna a la otra, como un patinador de hielo.",
+        "Caés en una sola pierna, con la otra cruzando por detrás.",
+        "Al caer te quedás quieto 2 segundos antes del siguiente salto."
+      ],
+      secciones: [
+        { titulo: "Cómo tenés que caer", texto: "Rodilla apuntando hacia el pie (que no se vaya para adentro) y tobillo firme. Caída suave y silenciosa." },
+        { titulo: "Por qué la pausa", texto: "Primero aprendés a frenar la caída; la velocidad viene después." }
+      ]
+    },
+    revisar: true
+  },
+  "carrera-caminata": {
+    nombre: "Carrera-caminata",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Corazón y piernas (base aeróbica)",
+    material: ["peso corporal"],
+    precauciones: {
+      etiquetas: ["tibia", "tendón de Aquiles", "rodilla", "lumbar"],
+      nota: "Molestia de más de 3/10 en tibia, Aquiles, rodilla o lumbar (durante o al día siguiente), o que empeora mientras corre: avisa y no se avanza la semana siguiente."
+    },
+    videos: [],
+    descripcion: {
+      musculos: "Construir base aeróbica y acostumbrar de a poco tendones, huesos y planta del pie al impacto. De a poco vas a correr más y caminar menos.",
+      pasos: [
+        "Alternás tramos de trote suave con tramos caminando, según el formato del día.",
+        "El trote es suave: tenés que poder hablar con frases completas. Si te falta el aire para hablar, bajá el ritmo.",
+        "No importa la velocidad, importa el tiempo."
+      ],
+      secciones: [
+        { titulo: "Si pisás pesado", texto: "Si sentís que golpeás el piso, hacé los pasos un poco más cortos y más rápidos. Eso baja la carga en las rodillas y la cadera." }
+      ]
+    },
+    revisar: true
+  },
+  "piques-progresivos": {
+    nombre: "Piques progresivos",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Piernas (velocidad)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Preparar las piernas para ir rápido antes de las pasadas.",
+      pasos: [
+        "En llano. Empezás suave y vas acelerando hasta ir rápido al final.",
+        "Volvés caminando."
+      ]
+    },
+    revisar: true
+  },
+  "pasadas": {
+    nombre: "Pasadas",
+    familia: "carrera",
+    categoria: "carrera",
+    patron: ["carrera"],
+    musculos: "Piernas (velocidad)",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: ["rodilla", "lumbar"], nota: "En cuesta, la bajada siempre caminando: bajar corriendo golpea mucho rodillas y espalda." },
+    videos: [],
+    descripcion: {
+      musculos: "Que las piernas se acostumbren a ir rápido, como cuando tenés que picar en el fútbol, sin ir a muerte.",
+      pasos: [
+        "Elegí dos marcas fijas (un árbol, un cartel) y cronometrá cada pasada con el celular.",
+        "Intensidad 70-80 %: rápido y suelto, como si fueras a buscar una pelota. Al terminar tenés que sentir que podrías hacer otra igual.",
+        "Volvés siempre caminando y descansás hasta sentirte listo (más o menos 90 segundos)."
+      ],
+      secciones: [
+        { titulo: "Cuándo terminar", texto: "Las pasadas tienen que salir con tiempos parecidos (más o menos 1 segundo de diferencia). Si una sale claramente más lenta, o tenés que apretar mucho para mantener el tiempo, terminás ahí." },
+        { titulo: "Para medir la distancia", texto: "Caminando, 50 m son unos 65-70 pasos normales." }
+      ]
+    },
+    revisar: true
   }
 };
 
@@ -1874,6 +2189,116 @@ const ETAPA6 = {
             { id: "estiramiento-hombro-anterior-banco", dosis: "30 s", nota: "Manos apoyadas atrás, bajá despacio." },
             { id: "estiramiento-triceps", dosis: "30 s por brazo", nota: "Codo flexionado, la otra mano lo lleva hacia atrás." },
             { id: "estiramiento-postura-nino", dosis: "30 s", nota: "Brazos estirados: cadera a los talones, manos lejos, aflojá la espalda." }
+          ]
+        }
+      ]
+    },
+    {
+      nombre: "Miércoles · Carrera + pliometría",
+      objetivo: "Volver a correr de a poco y construir base aeróbica: que el corazón y los músculos aprendan a trabajar mucho tiempo sin cansarse. Los pulmones se adaptan rápido, pero los tendones, huesos y la planta del pie tardan más en acostumbrarse al impacto: por eso arrancamos con carrera-caminata. Además, un ABC de carrera que te prepara para correr mejor y unas pasadas cortas para que las piernas se acostumbren a ir rápido (te protege para cuando tengas que picar en el fútbol).",
+      alerta: {
+        titulo: "Regla de las molestias · la más importante de la sesión",
+        texto: "Si mientras corrés o al día siguiente aparece una molestia de más de 3 sobre 10 en la tibia, el tendón de Aquiles (atrás del tobillo), la rodilla o la zona lumbar, o una molestia que empeora mientras corrés: avisame y la semana siguiente no avanzamos.",
+        nota: "Que te duelan los gemelos los primeros días es normal y no cuenta."
+      },
+      info: [
+        {
+          titulo: "📍 Dónde y qué llevar",
+          items: [
+            "En la rambla. Para el ABC y las pasadas buscá pasto: amortigua mucho más que el pavimento.",
+            "Llevá el reloj o el celular: todo se mide por tiempo, no por velocidad. Si tu reloj tiene GPS o mide pulsaciones, dejalo grabando aunque no lo mires: nos sirve para planificar enero.",
+            "Zapatillas con buena amortiguación."
+          ]
+        }
+      ],
+      reglas: [
+        "Todo se mide por tiempo, no por velocidad.",
+        "Si llegás con las piernas pesadas, las pasadas son lo primero que se saca."
+      ],
+      bloques: [
+        {
+          nombre: "1 · Entrada en calor",
+          ejercicios: [
+            { id: "caminata", dosis: "5-10 min", nota: "Hasta la rambla, a paso vivo." },
+            { id: "trote-suave", dosis: "3 min", nota: "Muy suave, que puedas hablar tranquilo." },
+            { id: "movilidad-articular-general", dosis: "~3 min", nota: "Círculos de tobillos, rodillas, cadera y hombros, en los dos sentidos." },
+            { id: "worlds-greatest-stretch", dosis: "5 por lado" },
+            { id: "balanceos-pierna", nuevo: true, dosis: "10 + 10 por pierna" },
+            { id: "movilidad-tobillo-media-rodilla", dosis: "10 por lado", nota: "La rodilla de adelante va hacia adelante, por encima de los dedos, sin despegar el talón. 1 segundo adelante y volvés." },
+            { id: "puente-gluteos", dosis: "2 × 12", nota: "En el pasto. 2 segundos arriba y bajás lento. El que empuja es el glúteo, sin arquear la zona lumbar." },
+            { id: "plancha-frontal-lateral", dosis: "1 serie: 30 s frontal + 20-30 s lateral por lado", nota: "Cuerpo en línea recta, que la cadera no se caiga. En la lateral, empujá el piso con el codo." },
+            { id: "elevaciones-talon", dosis: "1 × 15", nota: "1 segundo arriba y bajás lento. Prepara el gemelo y el tendón de Aquiles antes de los saltos." }
+          ]
+        },
+        {
+          nombre: "2 · ABC de carrera + saltos",
+          nota: "En el pasto. Cada ejercicio: 10 m de ida y volvés caminando. Van de más suave a más intenso: respetá el orden. Al principio te van a salir medio desordenados, es normal.",
+          reglas: [
+            "En todos los saltos: caída suave y silenciosa. Si hacés ruido al caer, saltá más bajito."
+          ],
+          ejercicios: [
+            { id: "galope-frontal", nuevo: true, dosis: "1 × 10 m" },
+            { id: "galope-lateral", nuevo: true, dosis: "1 × 10 m por lado" },
+            { id: "taloneo", nuevo: true, dosis: "1 × 10 m" },
+            { id: "skipping", nuevo: true, dosis: "3 × 10 m", nota: "1.ª pasada bajo (rodilla poco), 2.ª medio, 3.ª alto (muslo casi paralelo al piso)." },
+            { id: "skipping-lateral", nuevo: true, dosis: "1 × 10 m por lado" },
+            { id: "pogo-jumps", dosis: "2 × 10", nota: "Solo tobillos, rodillas casi rectas. Tocás el piso y rebotás rápido. Saltos chicos." },
+            { id: "skipping-impulso", nuevo: true, dosis: "2 × 10 m" },
+            { id: "salto-patinador", nuevo: true, dosis: "3 por lado · 2 s quieto en cada caída" }
+          ],
+          cierre: {
+            titulo: "🎥 Video",
+            texto: "Mandame un video del salto de patinador, de frente, en esta primera sesión."
+          }
+        },
+        {
+          nombre: "3 · Carrera-caminata",
+          nota: "Por la rambla. Acordate de la regla de las molestias.",
+          ejercicios: [
+            {
+              id: "carrera-caminata",
+              dosis: "5 × (3 min trotando + 1 min caminando) · 15 min corriendo en total",
+              anotar: [
+                { etiqueta: "¿Completaste el formato?", opciones: ["Sí, completo", "Lo corté antes"] },
+                { etiqueta: "Si lo cortaste: ¿hasta dónde llegaste?", placeholder: "ej.: 3 de 5" },
+                { etiqueta: "Ritmo (si el reloj lo da)", placeholder: "min/km" },
+                { etiqueta: "Pulsaciones (si el reloj las da)", placeholder: "media / máx." }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "4 · Piques",
+          ejercicios: [
+            { id: "piques-progresivos", dosis: "2 × 20 m", nota: "En llano. Preparan las piernas para las pasadas, que vienen justo después." }
+          ]
+        },
+        {
+          nombre: "5 · Pasadas",
+          nota: "A · en cuesta (la preferida): subida suave de pasto, 40-50 m (10-15 s). B · en llano, si no encontrás subida: pasto en llano, 30-40 m. C · si no hay pasto ni subida: ese día no las hacés.",
+          ejercicios: [
+            {
+              id: "pasadas",
+              dosis: "5 repeticiones · 70-80 % · volvés caminando y descansás ≈ 90 s",
+              anotar: [
+                { etiqueta: "¿Dónde las hiciste?", opciones: ["A · Cuesta", "B · Llano", "C · No las hice"] },
+                { etiqueta: "Pasada 1", placeholder: "segundos" },
+                { etiqueta: "Pasada 2", placeholder: "segundos" },
+                { etiqueta: "Pasada 3", placeholder: "segundos" },
+                { etiqueta: "Pasada 4", placeholder: "segundos" },
+                { etiqueta: "Pasada 5", placeholder: "segundos" }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "6 · Estiramientos",
+          nota: "30 segundos cada uno. Después volvés caminando: esa es tu vuelta a la calma.",
+          ejercicios: [
+            { id: "estiramiento-gemelo-pared", dosis: "30 s por posición y pierna", nota: "Dos posiciones: rodilla de atrás estirada (gemelo) y flexionada (sóleo)." },
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna", nota: "Talón hacia el glúteo, rodillas juntas, abdomen firme sin arquear la espalda." },
+            { id: "estiramiento-flexor-cadera", dosis: "30 s por pierna", nota: "Rodilla de atrás apoyada, apretá el glúteo de esa pierna y llevá la cadera un poco adelante." },
+            { id: "estiramiento-isquios-sentado", dosis: "30 s por pierna", nota: "Pierna estirada, inclinate desde la cadera con la espalda larga." }
           ]
         }
       ]
@@ -2615,12 +3040,33 @@ function camposAnotar(campos, idBase) {
   return `
     <div class="registro">
       <div class="registro-titulo">📝 Anotá</div>
-      ${campos.map((c, k) => `
+      ${campos.map((c, k) => c.opciones ? `
+        <div class="fila-anotar con-opciones">
+          <span>${c.etiqueta}</span>
+          <div class="opciones">${c.opciones.map(o => `<button type="button" class="opcion" data-para="${idBase}-a${k}" data-valor="${escapar(o)}" onclick="elegirOpcion(this)">${o}</button>`).join('')}</div>
+          <input type="hidden" data-id="${idBase}-a${k}">
+        </div>` : `
         <div class="fila-anotar">
           <span>${c.etiqueta}</span>
           <input placeholder="${c.placeholder || ''}" data-id="${idBase}-a${k}">
         </div>`).join('')}
     </div>`;
+}
+
+// OPCIONES (25/11): en vez de escribir, toca un botón ("Cuesta" / "Llano"...).
+// El valor elegido va a un campo oculto y se guarda igual que lo escrito a mano.
+// Tocar otra vez la opción elegida la desmarca.
+function elegirOpcion(boton) {
+  const campo = document.querySelector(`[data-id="${boton.dataset.para}"]`);
+  campo.value = campo.value === boton.dataset.valor ? '' : boton.dataset.valor;
+  campo.dispatchEvent(new Event('input', { bubbles: true }));
+  marcarOpciones();
+}
+function marcarOpciones() {
+  document.querySelectorAll('.opcion').forEach(b => {
+    const campo = document.querySelector(`[data-id="${b.dataset.para}"]`);
+    b.classList.toggle('elegida', !!campo && campo.value === b.dataset.valor);
+  });
 }
 
 // Dibuja un ejercicio simple (calentamiento, cardio, estiramientos)
@@ -2639,104 +3085,404 @@ function tarjetaSimple(ej, idEj) {
     </div>`;
 }
 
-// Dibuja un día completo
-function mostrarDia(indice) {
-  const dia = RUTINA.dias[indice];
-  // Base de los identificadores: incluye la etapa, para que "Día 1" de una etapa
-  // no pise los datos de "Día 1" de otra en el borrador. Ej: "etapa6-fin-de-anio-d0"
-  const base = `${RUTINA.id}-d${indice}`;
-  // Si el día tiene reglas propias, se usan esas; si no, las generales de la etapa.
-  const reglas = dia.reglas || RUTINA.reglas;
+/* =========================================================
+   MODO ENTRENAMIENTO (24/11/2026)
+   - El día se ve primero como resumen (reglas + lista de ejercicios).
+   - "Empezar sesión" abre UN EJERCICIO POR PANTALLA con "✓ Hecho".
+   - Todo lo que anota se guarda en Supabase a medida que entrena
+     (y también en el móvil, por si se corta internet).
+   ========================================================= */
 
-  // Objetivo, duración e intensidad son opcionales: si el día no los trae, no se muestran.
+// ---------- Guardar cosas en el móvil (localStorage) ----------
+// try/catch: si el navegador no deja guardar, la app sigue funcionando igual.
+function leerLocal(clave, porDefecto) {
+  try { return JSON.parse(localStorage.getItem(clave)) || porDefecto; } catch (e) { return porDefecto; }
+}
+function guardarLocal(clave, valor) {
+  try { localStorage.setItem(clave, JSON.stringify(valor)); } catch (e) {}
+}
+
+// BORRADOR: todo lo que Rodrigo escribe (kg, reps, notas...). Clave = data-id del campo.
+let borrador = leerLocal('registro-rutina', {});
+// SESIONES ABIERTAS: una por día que esté entrenando. Clave = "etapa6-fin-de-anio-d1".
+let sesionesAbiertas = leerLocal('sesiones-abiertas', {});
+// Si pasaron más de 6 horas, la sesión se da por terminada (la duración real
+// la calcula la base con su última actividad: ver vista_sesiones).
+const HORAS_SESION_VIEJA = 6;
+
+function valor(id) { return (borrador[id] || '').toString().trim(); }
+
+// Cada vez que escribe algo: lo guardamos en el borrador y, si hay sesión, en la base.
+// COPIADOS: campos que se llenaron solos al copiar la serie anterior (se ven en otro tono).
+let copiados = leerLocal('campos-copiados', {});
+
+document.addEventListener('input', e => {
+  const id = e.target.dataset.id;
+  if (!id) return;
+  if (e.target.value) borrador[id] = e.target.value; else delete borrador[id];
+  delete copiados[id];              // lo escribió a mano: ya no es "copiado"
+  e.target.classList.remove('copiado');
+  copiarALasSiguientes(id, e.target.value);
+  guardarLocal('registro-rutina', borrador);
+  guardarLocal('campos-copiados', copiados);
+  if (pantalla.tipo === 'paso') encolarEjercicioActual();
+  if (pantalla.tipo === 'dia' && id.includes('-antes-')) encolarAntes(pantalla.indice);
+});
+
+// LA SERIE SIGUIENTE COPIA LA ANTERIOR: si en la serie 1 pone 65 kg, las series 2, 3 y 4
+// se llenan con 65. Solo toca las que están vacías o que se habían llenado solas:
+// lo que Rodrigo escribió a mano nunca se pisa. Vale para kg y reps (el RIR no se copia).
+function copiarALasSiguientes(id, texto) {
+  const m = id.match(/^(.*)-s(\d+)-(peso|reps)$/);
+  if (!m || pantalla.tipo !== 'paso') return;
+  const [, idEj, n, campo] = m;
+  const { ej } = pasosDelDia(pantalla.indice)[pantalla.paso];
+  const total = parseInt(ej.series) || 3;
+  for (let s = parseInt(n) + 1; s <= total; s++) {
+    const otro = `${idEj}-s${s}-${campo}`;
+    if (valor(otro) && !copiados[otro]) break;   // escrito a mano: de acá en adelante no se toca
+    if (texto) { borrador[otro] = texto; copiados[otro] = true; }
+    else { delete borrador[otro]; delete copiados[otro]; }
+    const input = document.querySelector(`[data-id="${otro}"]`);
+    if (input) { input.value = texto; input.classList.toggle('copiado', !!texto); }
+  }
+}
+
+function restaurarBorrador() {
+  document.querySelectorAll('[data-id]').forEach(campo => {
+    if (borrador[campo.dataset.id]) campo.value = borrador[campo.dataset.id];
+    campo.classList.toggle('copiado', !!copiados[campo.dataset.id]);
+  });
+  marcarOpciones();
+}
+
+// ---------- Pasos del día: todos los ejercicios en fila ----------
+// Cada paso sabe en qué bloque está (b), qué número de ejercicio es (e) y su "posicion" ("b1-e0"),
+// que es lo que se guarda en la base para saber de qué ejercicio del día se trata.
+function pasosDelDia(indice) {
+  const dia = RUTINA.dias[indice];
+  const base = `${RUTINA.id}-d${indice}`;
+  const pasos = [];
+  dia.bloques.forEach((bloque, b) => {
+    bloque.ejercicios.map(resolver).forEach((ej, e) => {
+      pasos.push({
+        ej, bloque, b, e,
+        posicion: `b${b}-e${e}`,
+        idEj: `${base}-b${b}-e${e}`,
+        primeroDelBloque: e === 0,
+        ultimoDelBloque: e === bloque.ejercicios.length - 1
+      });
+    });
+  });
+  return pasos;
+}
+
+const claveDia = indice => `${RUTINA.id}-d${indice}`;
+const sesionDe = indice => sesionesAbiertas[claveDia(indice)];
+const fechaLocal = () => new Date().toLocaleDateString('sv-SE'); // "2026-11-24"
+
+function limpiarSesionesViejas() {
+  const limite = Date.now() - HORAS_SESION_VIEJA * 3600 * 1000;
+  Object.entries(sesionesAbiertas).forEach(([clave, s]) => {
+    if (new Date(s.inicio).getTime() < limite) {
+      delete sesionesAbiertas[clave];
+      borrarBorradorDelDia(clave);
+    }
+  });
+  guardarLocal('sesiones-abiertas', sesionesAbiertas);
+}
+
+function borrarBorradorDelDia(clave) {
+  Object.keys(borrador).forEach(id => { if (id.startsWith(clave + '-')) delete borrador[id]; });
+  Object.keys(copiados).forEach(id => { if (id.startsWith(clave + '-')) delete copiados[id]; });
+  guardarLocal('registro-rutina', borrador);
+  guardarLocal('campos-copiados', copiados);
+}
+
+// ---------- Qué hay en pantalla ----------
+let pantalla = { tipo: 'dia', indice: 0, paso: 0 };
+
+function marcarPestana(indice) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('activa', i === indice));
+}
+
+// RESUMEN DEL DÍA: reglas, preguntas previas, lista de ejercicios y botón para empezar
+function mostrarDia(indice) {
+  pantalla = { tipo: 'dia', indice, paso: 0 };
+  const dia = RUTINA.dias[indice];
+  const base = claveDia(indice);
+  const reglas = dia.reglas || RUTINA.reglas;
+  const sesion = sesionDe(indice);
+  const pasos = pasosDelDia(indice);
+
   let html = `<h3 class="titulo-dia">${dia.nombre}</h3>`;
   if (dia.objetivo) html += `<p>${dia.objetivo}</p>`;
   const chips = [];
   if (dia.duracion) chips.push(`⏱ ${dia.duracion}`);
   if (dia.intensidad) chips.push(`💪 ${dia.intensidad}`);
-  if (chips.length) html += `<div class="resumen">${chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>`;
-  // Antes de empezar: las reglas (ahora arriba, se leen antes de entrenar) y las preguntas previas
-  html += `
-    <h2>Antes de empezar</h2>
-    <div class="tarjeta reglas"><ul>${reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+  chips.push(`📋 ${pasos.length} ejercicios`);
+  html += `<div class="resumen">${chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>`;
+
+  html += `<h2>Antes de empezar</h2>`;
+  // Alerta (25/11): una regla que tiene que verse sí o sí, arriba de todo
+  if (dia.alerta) html += `<div class="tarjeta alerta"><b>⚠ ${dia.alerta.titulo}</b>${dia.alerta.texto}${dia.alerta.nota ? `<p>${dia.alerta.nota}</p>` : ''}</div>`;
+  // Info práctica (25/11): dónde, qué llevar...
+  (dia.info || []).forEach(i => {
+    html += `<div class="tarjeta info"><b>${i.titulo}</b><ul>${i.items.map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+  });
+  html += `<div class="tarjeta reglas"><ul>${reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
   if (dia.antes) html += `<div class="tarjeta">${camposAnotar(dia.antes, `${base}-antes`)}</div>`;
 
+  // Botón principal: empezar o continuar
+  if (sesion) {
+    const hechos = Object.keys(sesion.hechos || {}).length;
+    html += `<button class="boton" onclick="mostrarPaso(${indice}, ${sesion.paso || 0})">▶ Continuar sesión · ${hechos} de ${pasos.length} hechos</button>`;
+  } else {
+    html += `<button class="boton" onclick="empezarSesion(${indice})">▶ Empezar sesión</button>`;
+  }
+
+  // Lista de ejercicios agrupada por bloque (con ✓ en los ya hechos)
   dia.bloques.forEach((bloque, b) => {
     html += `<h2>${bloque.nombre}</h2>`;
     if (bloque.nota) html += `<p class="nota-bloque">${bloque.nota}</p>`;
-    if (bloque.reglas) html += `<div class="tarjeta reglas"><ul>${bloque.reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
-    bloque.ejercicios.map(resolver).forEach((ej, e) => {
-      // idEj identifica cada ejercicio de forma única: "d0-b1-e0" = día 0, bloque 1, ejercicio 0
-      const idEj = `${base}-b${b}-e${e}`;
-      html += bloque.principal ? tarjetaPrincipal(ej, idEj) : tarjetaSimple(ej, idEj);
+    html += `<div class="tarjeta lista-ejercicios">`;
+    pasos.filter(p => p.b === b).forEach(p => {
+      const k = pasos.indexOf(p);
+      const hecho = sesion && sesion.hechos && sesion.hechos[p.posicion];
+      const dosis = p.bloque.principal ? `${p.ej.series}×${p.ej.reps} · ${p.ej.carga}` : (p.ej.dosis || '');
+      html += `
+        <button class="item-ejercicio${hecho ? ' hecho' : ''}" ${sesion ? `onclick="mostrarPaso(${indice}, ${k})"` : 'disabled'}>
+          <span class="marca">${hecho ? '✓' : k + 1}</span>
+          <span><b>${p.ej.grupo ? p.ej.grupo + ' · ' : ''}${p.ej.nombre}</b><small>${dosis}</small></span>
+        </button>`;
     });
-    if (bloque.cierre) html += `<div class="tarjeta cierre"><b>${bloque.cierre.titulo}</b>${bloque.cierre.texto}</div>`;
+    html += `</div>`;
   });
 
-  html += `
-    <h2>Cierre de la sesión</h2>
-    <div class="tarjeta">
-      <div class="registro-titulo">¿Cómo te sentiste? ¿Alguna molestia?</div>
-      <textarea placeholder="Ej: buena sesión, sentadilla cómoda, algo de carga en el hombro izquierdo…" data-id="${base}-nota"></textarea>
-      <button class="boton" onclick="generarResumen(${indice})">Terminar sesión</button>
-      <p class="aviso">Lo que escribís se guarda solo en este móvil. Es una versión de prueba.</p>
-      <div id="resumen"></div>
+  document.getElementById('contenido').innerHTML = html;
+  restaurarBorrador();
+  marcarPestana(indice);
+  window.scrollTo(0, 0);
+}
+
+function empezarSesion(indice) {
+  const dia = RUTINA.dias[indice];
+  // Sesión nueva = hoja en blanco: si quedó algo escrito de otra semana, se borra
+  // (menos lo que acaba de anotar en "Antes de empezar").
+  const base = claveDia(indice);
+  Object.keys(borrador).forEach(id => { if (id.startsWith(base + '-') && !id.startsWith(base + '-antes-')) { delete borrador[id]; delete copiados[id]; } });
+  guardarLocal('registro-rutina', borrador);
+  guardarLocal('campos-copiados', copiados);
+  const sesion = {
+    id: crypto.randomUUID(),          // el id lo crea el móvil: así funciona aunque no haya internet
+    dia: dia.nombre,
+    rutina_id: RUTINA.id,
+    fecha: fechaLocal(),
+    inicio: new Date().toISOString(),
+    paso: 0,
+    hechos: {}
+  };
+  sesionesAbiertas[claveDia(indice)] = sesion;
+  guardarLocal('sesiones-abiertas', sesionesAbiertas);
+  encolarSesion(sesion);
+  encolarAntes(indice);
+  mostrarPaso(indice, 0);
+}
+
+// UN EJERCICIO POR PANTALLA
+function mostrarPaso(indice, k) {
+  const sesion = sesionDe(indice);
+  if (!sesion) return mostrarDia(indice);
+  const pasos = pasosDelDia(indice);
+  if (k >= pasos.length) return mostrarCierre(indice);
+  k = Math.max(0, k);
+  pantalla = { tipo: 'paso', indice, paso: k };
+  sesion.paso = k;
+  guardarLocal('sesiones-abiertas', sesionesAbiertas);
+
+  const p = pasos[k];
+  const hechos = Object.keys(sesion.hechos).length;
+  const hecho = !!sesion.hechos[p.posicion];
+  const porcentaje = Math.round(hechos / pasos.length * 100);
+
+  let html = `
+    <div class="progreso">
+      <div class="progreso-texto"><span>${p.bloque.nombre}</span><span>${k + 1} de ${pasos.length}</span></div>
+      <div class="barra"><div style="width:${porcentaje}%"></div></div>
+      <div class="progreso-texto"><small>✓ ${hechos} hechos</small><button class="link" onclick="mostrarDia(${indice})">☰ Ver todos</button></div>
     </div>`;
+  if (p.primeroDelBloque && p.bloque.nota) html += `<p class="nota-bloque">${p.bloque.nota}</p>`;
+  if (p.primeroDelBloque && p.bloque.reglas) html += `<div class="tarjeta reglas"><ul>${p.bloque.reglas.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+  html += p.bloque.principal ? tarjetaPrincipal(p.ej, p.idEj) : tarjetaSimple(p.ej, p.idEj);
+  if (p.ultimoDelBloque && p.bloque.cierre) html += `<div class="tarjeta cierre"><b>${p.bloque.cierre.titulo}</b>${p.bloque.cierre.texto}</div>`;
+
+  html += `
+    <div class="botonera">
+      <button class="boton secundario" onclick="mostrarPaso(${indice}, ${k - 1})" ${k === 0 ? 'disabled' : ''}>←</button>
+      <button class="boton${hecho ? ' ya-hecho' : ''}" onclick="marcarHecho(${indice}, ${k})">${hecho ? '✓ Hecho · siguiente' : '✓ Hecho'}</button>
+    </div>
+    <button class="link centrado" onclick="mostrarPaso(${indice}, ${k + 1})">${k === pasos.length - 1 ? 'Ir al cierre →' : 'Saltear por ahora →'}</button>
+    ${hecho ? `<button class="link centrado" onclick="desmarcarHecho(${indice}, ${k})">Desmarcar</button>` : ''}`;
 
   document.getElementById('contenido').innerHTML = html;
-  restaurarBorrador(indice);
+  restaurarBorrador();
+  // En el principal, los detalles de técnica se abren solos: es lo que más se consulta
+  marcarPestana(indice);
+  window.scrollTo(0, 0);
+}
 
-  // Marcar la pestaña activa
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('activa', i === indice));
+function marcarHecho(indice, k) {
+  const sesion = sesionDe(indice);
+  const p = pasosDelDia(indice)[k];
+  if (!sesion.hechos[p.posicion]) {
+    sesion.hechos[p.posicion] = new Date().toISOString();
+    guardarLocal('sesiones-abiertas', sesionesAbiertas);
+    encolar(`hecho|${sesion.id}|${p.posicion}`, {
+      tabla: 'ejercicios_hechos', conflicto: 'sesion_id,posicion',
+      fila: { sesion_id: sesion.id, posicion: p.posicion, ejercicio_id: p.ej.id, hecho_en: sesion.hechos[p.posicion] }
+    });
+  }
+  mostrarPaso(indice, k + 1);
+}
+
+function desmarcarHecho(indice, k) {
+  const sesion = sesionDe(indice);
+  const p = pasosDelDia(indice)[k];
+  delete sesion.hechos[p.posicion];
+  guardarLocal('sesiones-abiertas', sesionesAbiertas);
+  encolar(`hecho|${sesion.id}|${p.posicion}`, {
+    tabla: 'ejercicios_hechos', borrar: { sesion_id: sesion.id, posicion: p.posicion }
+  });
+  mostrarPaso(indice, k);
+}
+
+// CIERRE: cómo se sintió, resumen y "Terminar sesión"
+function mostrarCierre(indice) {
+  const sesion = sesionDe(indice);
+  if (!sesion) return mostrarDia(indice);
+  pantalla = { tipo: 'cierre', indice, paso: 0 };
+  const pasos = pasosDelDia(indice);
+  const hechos = Object.keys(sesion.hechos).length;
+  const faltan = pasos.map((p, k) => ({ p, k })).filter(({ p }) => !sesion.hechos[p.posicion]);
+  const base = claveDia(indice);
+
+  let html = `<h3 class="titulo-dia">Cierre de la sesión</h3>
+    <div class="resumen">
+      <span class="chip">✓ ${hechos} de ${pasos.length} ejercicios</span>
+      <span class="chip">⏱ ${minutosDesde(sesion.inicio)} min</span>
+    </div>`;
+  if (faltan.length) {
+    html += `<div class="tarjeta"><div class="registro-titulo">Quedaron sin marcar</div>
+      ${faltan.map(({ p, k }) => `<button class="item-ejercicio" onclick="mostrarPaso(${indice}, ${k})"><span class="marca">${k + 1}</span><span><b>${p.ej.nombre}</b><small>${p.bloque.nombre}</small></span></button>`).join('')}
+    </div>`;
+  }
+  html += `
+    <div class="tarjeta">
+      <div class="registro-titulo">¿Cómo te sentiste? ¿Alguna molestia?</div>
+      ${RUTINA.dias[indice].alerta ? `<p class="detalle">⚠ ${RUTINA.dias[indice].alerta.texto}</p>` : ''}
+      <textarea placeholder="Ej: buena sesión, banca cómoda, algo de carga en el hombro izquierdo…" data-id="${base}-nota"></textarea>
+      <button class="boton" onclick="terminarSesion(${indice})">Terminar sesión</button>
+      <button class="boton secundario" onclick="mostrarPaso(${indice}, ${pasos.length - 1})">← Volver al último ejercicio</button>
+    </div>`;
+  document.getElementById('contenido').innerHTML = html;
+  restaurarBorrador();
+  window.scrollTo(0, 0);
+}
+
+function minutosDesde(iso) { return Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); }
+
+function terminarSesion(indice) {
+  const sesion = sesionDe(indice);
+  const base = claveDia(indice);
+  const pasos = pasosDelDia(indice);
+  const texto = generarResumen(indice);
+  const tarjetaResumen = resumenVisual(indice);
+  const hechos = Object.keys(sesion.hechos).length;
+  const minutos = minutosDesde(sesion.inicio);
+  const series = pasos.filter(p => p.bloque.principal)
+    .reduce((n, p) => n + Array.from({ length: parseInt(p.ej.series) || 3 }, (_, s) => valor(`${p.idEj}-s${s + 1}-peso`) || valor(`${p.idEj}-s${s + 1}-reps`)).filter(Boolean).length, 0);
+
+  sesion.fin = new Date().toISOString();
+  sesion.nota = valor(`${base}-nota`) || null;
+  encolarSesion(sesion);
+  // La sesión se cierra: el próximo martes arranca en limpio (lo de hoy ya está en la base)
+  delete sesionesAbiertas[base];
+  guardarLocal('sesiones-abiertas', sesionesAbiertas);
+  borrarBorradorDelDia(base);
+  pantalla = { tipo: 'fin', indice, paso: 0 };
+
+  document.getElementById('contenido').innerHTML = `
+    <div class="felicitacion">
+      <div class="grande">🎉</div>
+      <h3>¡Sesión completa!</h3>
+      <div class="resumen centrado-flex">
+        <span class="chip">⏱ ${minutos} min</span>
+        <span class="chip">✓ ${hechos} de ${pasos.length} ejercicios</span>
+        <span class="chip">📝 ${series} series anotadas</span>
+      </div>
+      <p class="detalle">${usuario ? 'Tus registros se guardan solos (si no hay internet, apenas vuelva).' : 'Mandale el resumen a tu entrenador.'}</p>
+    </div>
+    <div class="tarjeta">
+      <div class="registro-titulo">Tu sesión</div>
+      ${tarjetaResumen}
+      <button class="boton secundario" id="boton-copiar">Copiar para enviar por WhatsApp</button>
+    </div>
+    <button class="boton" onclick="mostrarDia(${indice})">Volver al día</button>`;
+  document.getElementById('boton-copiar').onclick = async () => {
+    const boton = document.getElementById('boton-copiar');
+    try { await navigator.clipboard.writeText(texto); boton.textContent = '✓ Copiado'; }
+    catch (e) { boton.textContent = 'No se pudo copiar: mantené apretado el texto de arriba'; }
+  };
   window.scrollTo(0, 0);
 }
 
 /* ---------------------------------------------------------
-   BORRADOR: cada vez que Rodrigo escribe algo, lo guardamos
-   en el navegador. Si cierra la página y vuelve, no pierde nada.
-   (Es temporal: en la siguiente etapa esto irá a la base de datos.)
+   RESUMEN VISUAL (lo que ve Rodrigo al terminar): cada ejercicio
+   con sus series como "pastillas". Lee del borrador.
    --------------------------------------------------------- */
-function guardarBorrador() {
-  const datos = {};
-  document.querySelectorAll('[data-id]').forEach(campo => {
-    if (campo.value) datos[campo.dataset.id] = campo.value;
+// Lo que escribe Rodrigo se "escapa" antes de mostrarlo: si escribiera algo con < o >,
+// se ve como texto y nunca se ejecuta como código.
+const escapar = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function resumenVisual(indice) {
+  const base = claveDia(indice);
+  let html = '';
+  pasosDelDia(indice).forEach(({ ej, bloque, idEj }) => {
+    const anotados = (ej.anotar || []).map((c, k) => [c.etiqueta, valor(`${idEj}-a${k}`)]).filter(([, v]) => v);
+    if (!bloque.principal && !anotados.length) return;
+    let series = [];
+    if (bloque.principal) {
+      for (let s = 1; s <= (parseInt(ej.series) || 3); s++) {
+        const kg = valor(`${idEj}-s${s}-peso`), reps = valor(`${idEj}-s${s}-reps`);
+        const rirS = ej.rirPorSerie ? valor(`${idEj}-s${s}-rir`) : '';
+        if (kg || reps) series.push(`${kg ? escapar(kg) + ' kg' : '—'} × ${reps ? escapar(reps) : '?'}${rirS ? ` · RIR ${escapar(rirS)}` : ''}`);
+      }
+    }
+    const rir = valor(`${idEj}-rir`);
+    html += `
+      <div class="res-ejercicio">
+        <div class="res-nombre">${ej.grupo ? `<span class="res-grupo">${ej.grupo}</span>` : ''}${ej.nombre}</div>
+        ${bloque.principal ? `<div class="res-series">${series.length ? series.map(x => `<span class="pastilla">${x}</span>`).join('') : '<span class="res-vacio">Sin anotar</span>'}${rir ? `<span class="pastilla rir">RIR ${escapar(rir)}</span>` : ''}</div>` : ''}
+        ${anotados.map(([e, v]) => `<div class="res-anotado">${e}: <b>${escapar(v)}</b></div>`).join('')}
+      </div>`;
   });
-  try {
-    const todo = JSON.parse(localStorage.getItem('registro-rutina') || '{}');
-    Object.assign(todo, datos);
-    localStorage.setItem('registro-rutina', JSON.stringify(todo));
-  } catch (e) { /* si el navegador no deja guardar, la app sigue funcionando igual */ }
+  const nota = valor(`${base}-nota`);
+  if (nota) html += `<div class="res-nota">💬 ${escapar(nota)}</div>`;
+  return html || '<p class="detalle">No anotaste series en esta sesión.</p>';
 }
-
-function restaurarBorrador() {
-  try {
-    const todo = JSON.parse(localStorage.getItem('registro-rutina') || '{}');
-    document.querySelectorAll('[data-id]').forEach(campo => {
-      if (todo[campo.dataset.id]) campo.value = todo[campo.dataset.id];
-    });
-  } catch (e) {}
-}
-
-// Escuchamos cualquier cambio en los campos y guardamos el borrador
-document.addEventListener('input', e => { if (e.target.dataset.id) guardarBorrador(); });
 
 /* ---------------------------------------------------------
-   RESUMEN: arma un texto con todo lo registrado, listo para
-   copiar y mandártelo por WhatsApp. Es el "puente" hasta que
-   tengamos la base de datos.
+   RESUMEN de texto para WhatsApp (respaldo). Lee del borrador.
    --------------------------------------------------------- */
-function valor(id) {
-  const campo = document.querySelector(`[data-id="${id}"]`);
-  return campo ? campo.value.trim() : '';
-}
-
 function generarResumen(indice) {
   const dia = RUTINA.dias[indice];
-  const base = `${RUTINA.id}-d${indice}`;
+  const base = claveDia(indice);
+  const sesion = sesionDe(indice);
   const fecha = new Date().toLocaleDateString('es-ES');
-  let texto = `${CLIENTE} · ${RUTINA.etapa} · ${dia.nombre} · ${fecha}\n`;
+  let texto = `${CLIENTE} · ${RUTINA.etapa} · ${dia.nombre} · ${fecha}`;
+  if (sesion) texto += `\n⏱ ${minutosDesde(sesion.inicio)} min · ✓ ${Object.keys(sesion.hechos).length} de ${pasosDelDia(indice).length} ejercicios`;
+  texto += '\n';
 
-  // Campos anotados: cada uno sale como "• Etiqueta: valor" (solo si se completó)
   const lineasAnotadas = (campos, idBase) => (campos || [])
     .map((c, k) => [c.etiqueta, valor(`${idBase}-a${k}`)])
     .filter(([, v]) => v)
@@ -2744,52 +3490,214 @@ function generarResumen(indice) {
 
   texto += lineasAnotadas(dia.antes, `${base}-antes`);
 
-  dia.bloques.forEach((bloque, b) => {
+  pasosDelDia(indice).forEach(({ ej, bloque, idEj }) => {
     if (!bloque.principal) {
-      bloque.ejercicios.map(resolver).forEach((ej, e) => {
-        const idEj = `${base}-b${b}-e${e}`;
-        const anotado = lineasAnotadas(ej.anotar, idEj);
-        if (anotado) texto += `\n${ej.nombre}${anotado.replace(/\n• /g, '\n   – ')}`;
-      });
+      const anotado = lineasAnotadas(ej.anotar, idEj);
+      if (anotado) texto += `\n${ej.nombre}${anotado.replace(/\n• /g, '\n   – ')}`;
       return;
     }
-    bloque.ejercicios.map(resolver).forEach((ej, e) => {
-      const idEj = `${base}-b${b}-e${e}`;
-      const series = [];
-      for (let s = 1; s <= (parseInt(ej.series) || 3); s++) {
-        const peso = valor(`${idEj}-s${s}-peso`);
-        const reps = valor(`${idEj}-s${s}-reps`);
-        const rirSerie = ej.rirPorSerie ? valor(`${idEj}-s${s}-rir`) : '';
-        if (peso || reps) series.push(`${peso || '?'}×${reps || '?'}${rirSerie ? ` (RIR ${rirSerie})` : ''}`);
-      }
-      const rir = valor(`${idEj}-rir`);
-      const prefijo = ej.grupo ? `${ej.grupo} ` : '';
-      texto += `\n• ${prefijo}${ej.nombre}: ${series.length ? series.join(', ') : 'sin datos'}`;
-      if (rir) texto += ` · RIR ${rir}`;
-      const anotado = lineasAnotadas(ej.anotar, idEj);
-      if (anotado) texto += anotado.replace(/\n• /g, '\n   – ');
-    });
+    const series = [];
+    for (let s = 1; s <= (parseInt(ej.series) || 3); s++) {
+      const peso = valor(`${idEj}-s${s}-peso`);
+      const reps = valor(`${idEj}-s${s}-reps`);
+      const rirSerie = ej.rirPorSerie ? valor(`${idEj}-s${s}-rir`) : '';
+      if (peso || reps) series.push(`${peso || '?'}×${reps || '?'}${rirSerie ? ` (RIR ${rirSerie})` : ''}`);
+    }
+    const rir = valor(`${idEj}-rir`);
+    const prefijo = ej.grupo ? `${ej.grupo} ` : '';
+    texto += `\n• ${prefijo}${ej.nombre}: ${series.length ? series.join(', ') : 'sin datos'}`;
+    if (rir) texto += ` · RIR ${rir}`;
+    const anotado = lineasAnotadas(ej.anotar, idEj);
+    if (anotado) texto += anotado.replace(/\n• /g, '\n   – ');
   });
 
   const nota = valor(`${base}-nota`);
   if (nota) texto += `\n\nNotas: ${nota}`;
+  return texto;
+}
 
-  document.getElementById('resumen').innerHTML = `
-    <pre class="resumen-texto" id="resumen-texto"></pre>
-    <button class="boton secundario" id="boton-copiar">Copiar para enviar por WhatsApp</button>`;
-  // textContent (y no innerHTML) para que lo que escribe Rodrigo se muestre tal cual, sin interpretarse como código
-  document.getElementById('resumen-texto').textContent = texto;
-  document.getElementById('resumen').scrollIntoView({ behavior: 'smooth' });
+/* =========================================================
+   GUARDADO EN SUPABASE
+   Cada cambio se pone en una "cola" (también guardada en el móvil).
+   La cola se manda a la base apenas se puede; si no hay internet,
+   espera y lo reintenta. Clave de la cola = qué dato es: si Rodrigo
+   corrige un número antes de que se mande, solo viaja el último.
+   ========================================================= */
+let cola = leerLocal('cola-guardado', {});
+let sincronizando = false;
+let temporizador = null;
 
-  document.getElementById('boton-copiar').onclick = async () => {
-    const boton = document.getElementById('boton-copiar');
-    try {
-      await navigator.clipboard.writeText(texto);
-      boton.textContent = '✓ Copiado';
-    } catch (e) {
-      boton.textContent = 'No se pudo copiar: mantené apretado el texto de arriba';
+function encolar(clave, operacion) {
+  operacion.orden = operacion.tabla === 'sesiones' ? 0 : 1; // primero la sesión, después lo demás
+  cola[clave] = operacion;
+  guardarLocal('cola-guardado', cola);
+  clearTimeout(temporizador);
+  temporizador = setTimeout(sincronizar, 700);
+  mostrarEstado();
+}
+
+function encolarSesion(s) {
+  encolar(`sesion|${s.id}`, {
+    tabla: 'sesiones', conflicto: 'id',
+    fila: { id: s.id, dia: s.dia, rutina_id: s.rutina_id, fecha: s.fecha, inicio: s.inicio, fin: s.fin || null, nota: s.nota || null }
+  });
+}
+
+const numero = t => { const n = parseFloat((t || '').replace(',', '.')); return isNaN(n) ? null : n; };
+const entero = t => { const n = parseInt(t || '', 10); return isNaN(n) || n < 0 || n > 999 ? null : n; };
+
+// Series y campos anotados del ejercicio que está en pantalla
+function encolarEjercicioActual() {
+  const { indice, paso } = pantalla;
+  const sesion = sesionDe(indice);
+  if (!sesion) return;
+  const p = pasosDelDia(indice)[paso];
+  const { ej, idEj, posicion, bloque } = p;
+
+  if (bloque.principal) {
+    const total = parseInt(ej.series) || 3;
+    for (let s = 1; s <= total; s++) {
+      const kg = numero(valor(`${idEj}-s${s}-peso`));
+      const reps = entero(valor(`${idEj}-s${s}-reps`));
+      // RIR: el de cada serie, o el "RIR de la última" va en la última serie
+      const rir = ej.rirPorSerie ? entero(valor(`${idEj}-s${s}-rir`)) : (s === total ? entero(valor(`${idEj}-rir`)) : null);
+      const clave = `serie|${sesion.id}|${posicion}|${s}`;
+      if (kg === null && reps === null && rir === null) {
+        encolar(clave, { tabla: 'series', borrar: { sesion_id: sesion.id, posicion, numero: s } });
+      } else {
+        encolar(clave, {
+          tabla: 'series', conflicto: 'sesion_id,posicion,numero',
+          fila: { sesion_id: sesion.id, posicion, ejercicio_id: ej.id, numero: s, kg, reps, rir, registrada_en: new Date().toISOString() }
+        });
+      }
     }
+  }
+  encolarAnotaciones(sesion, ej.anotar, idEj, posicion, ej.id);
+}
+
+function encolarAntes(indice) {
+  const sesion = sesionDe(indice);
+  if (!sesion) return;
+  encolarAnotaciones(sesion, RUTINA.dias[indice].antes, `${claveDia(indice)}-antes`, 'antes', null);
+}
+
+function encolarAnotaciones(sesion, campos, idBase, posicion, ejercicioId) {
+  (campos || []).forEach((c, k) => {
+    const v = valor(`${idBase}-a${k}`);
+    const clave = `anota|${sesion.id}|${posicion}|${c.etiqueta}`;
+    if (!v) encolar(clave, { tabla: 'anotaciones', borrar: { sesion_id: sesion.id, posicion, etiqueta: c.etiqueta } });
+    else encolar(clave, {
+      tabla: 'anotaciones', conflicto: 'sesion_id,posicion,etiqueta',
+      fila: { sesion_id: sesion.id, posicion, ejercicio_id: ejercicioId, etiqueta: c.etiqueta, valor: v, registrada_en: new Date().toISOString() }
+    });
+  });
+}
+
+async function sincronizar() {
+  if (!db || !usuario || sincronizando) return mostrarEstado();
+  sincronizando = true;
+  mostrarEstado();
+  const claves = Object.keys(cola).sort((a, b) => cola[a].orden - cola[b].orden);
+  let hayError = false;
+  for (const clave of claves) {
+    const op = cola[clave];
+    let consulta;
+    if (op.borrar) {
+      consulta = db.from(op.tabla).delete();
+      Object.entries(op.borrar).forEach(([col, v]) => { consulta = consulta.eq(col, v); });
+    } else {
+      consulta = db.from(op.tabla).upsert(op.fila, { onConflict: op.conflicto });
+    }
+    const { error } = await consulta;
+    if (!error) {
+      if (cola[clave] === op) delete cola[clave]; // si cambió mientras viajaba, queda la versión nueva
+    } else if (/^(22|23)/.test(error.code || '')) {
+      // Dato inválido (ej.: un número imposible): no se puede guardar nunca, se descarta
+      console.warn('Dato descartado', clave, error.message);
+      delete cola[clave];
+    } else {
+      console.warn('No se pudo guardar (se reintenta)', clave, error.message);
+      hayError = true;
+      if (op.tabla === 'sesiones') break; // sin la sesión no tiene sentido mandar lo demás
+    }
+  }
+  guardarLocal('cola-guardado', cola);
+  sincronizando = false;
+  mostrarEstado(hayError);
+  if (hayError) { clearTimeout(temporizador); temporizador = setTimeout(sincronizar, 15000); }
+}
+window.addEventListener('online', sincronizar);
+
+function mostrarEstado(hayError) {
+  const el = document.getElementById('estado-guardado');
+  if (!el) return;
+  const pendientes = Object.keys(cola).length;
+  if (!db) el.textContent = '';
+  else if (!usuario) el.textContent = '';
+  else if (sincronizando) el.textContent = 'Guardando…';
+  else if (pendientes && (hayError || !navigator.onLine)) el.textContent = '⚠ Sin conexión: se guarda al volver';
+  else if (pendientes) el.textContent = 'Guardando…';
+  else el.textContent = '✓ Guardado';
+}
+
+/* =========================================================
+   INICIO DE SESIÓN (Supabase Auth)
+   La clave de abajo es PÚBLICA a propósito: sirve solo para hablar con
+   la base. Lo que protege los datos son las reglas de seguridad (RLS):
+   cada cliente ve solo lo suyo y el entrenador lee todo.
+   ========================================================= */
+const SUPABASE_URL = "https://kuvnqilwqtlfwwuicgaj.supabase.co";
+const SUPABASE_CLAVE_PUBLICA = "sb_publishable_TH3ltV5QHyN_xq0T5aLLOA_zZG4Hbvx";
+const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_CLAVE_PUBLICA) : null;
+let usuario = null;
+
+function mostrarLogin(mensaje) {
+  document.getElementById('tabs').hidden = true;
+  document.getElementById('selector-etapa').hidden = true;
+  document.getElementById('contenido').innerHTML = `
+    <div class="tarjeta login">
+      <h3>Entrá a tu rutina</h3>
+      <p class="detalle">Con el email y la contraseña que te pasó tu entrenador.</p>
+      <form id="form-login">
+        <input type="email" id="login-email" placeholder="Email" autocomplete="username" required>
+        <input type="password" id="login-clave" placeholder="Contraseña" autocomplete="current-password" required>
+        <button class="boton" type="submit">Entrar</button>
+        <p class="aviso" id="login-error">${mensaje || ''}</p>
+      </form>
+    </div>`;
+  document.getElementById('form-login').onsubmit = async e => {
+    e.preventDefault();
+    const boton = e.target.querySelector('button');
+    boton.disabled = true; boton.textContent = 'Entrando…';
+    const { data, error } = await db.auth.signInWithPassword({
+      email: document.getElementById('login-email').value.trim(),
+      password: document.getElementById('login-clave').value
+    });
+    if (error) {
+      boton.disabled = false; boton.textContent = 'Entrar';
+      document.getElementById('login-error').textContent =
+        /invalid/i.test(error.message) ? 'Email o contraseña incorrectos.' : 'No se pudo entrar. Revisá tu conexión e intentá de nuevo.';
+      return;
+    }
+    entrar(data.user);
   };
+}
+
+function entrar(user) {
+  usuario = user;
+  document.getElementById('tabs').hidden = false;
+  document.getElementById('selector-etapa').hidden = false;
+  document.getElementById('boton-salir').hidden = false;
+  elegirEtapa(RUTINAS[0].id);
+  sincronizar();
+}
+
+async function salir() {
+  if (Object.keys(cola).length && !confirm('Hay datos que todavía no se guardaron. ¿Salir igual?')) return;
+  await db.auth.signOut();
+  usuario = null;
+  document.getElementById('boton-salir').hidden = true;
+  mostrarLogin();
 }
 
 /* ---------------------------------------------------------
@@ -2839,7 +3747,7 @@ function mostrarBiblioteca() {
   campo.focus(); campo.setSelectionRange(filtro.length, filtro.length);
 }
 
-// Cambiar de etapa: actualiza la cabecera y las pestañas y abre el primer día
+// Cambiar de etapa: actualiza la cabecera y las pestañas y abre el día que toca
 function elegirEtapa(id) {
   RUTINA = RUTINAS.find(r => r.id === id) || RUTINAS[0];
   document.getElementById('etapa-subtitulo').textContent = RUTINA.fechas;
@@ -2847,21 +3755,48 @@ function elegirEtapa(id) {
   document.getElementById('tabs').innerHTML = RUTINA.dias
     .map((d, i) => `<button class="tab" onclick="mostrarDia(${i})">${d.nombre.split(' · ')[0]}</button>`)
     .join('');
-  mostrarDia(0);
+  mostrarDia(diaQueToca());
 }
 
-// Arranque: nombre del cliente, opciones del selector y la etapa actual
-document.getElementById('cliente').textContent = CLIENTE;
-document.getElementById('selector-etapa').innerHTML = RUTINAS
-  .map(r => `<option value="${r.id}">${r.etapa}</option>`).join('');
-if (location.hash === '#biblioteca') {
-  document.getElementById('etapa-subtitulo').textContent = 'Vista del entrenador';
-  document.getElementById('cliente').textContent = 'Biblioteca de ejercicios';
-  document.getElementById('selector-etapa').hidden = true;
-  mostrarBiblioteca();
-} else {
-  elegirEtapa(RUTINAS[0].id);
+// Abre el día con una sesión en curso; si no hay, el de hoy ("Martes · ..." un martes); si no, el primero.
+function diaQueToca() {
+  const enCurso = RUTINA.dias.findIndex((d, i) => sesionDe(i));
+  if (enCurso >= 0) return enCurso;
+  const hoy = new Date().toLocaleDateString('es-ES', { weekday: 'long' }).toLowerCase();
+  const deHoy = RUTINA.dias.findIndex(d => d.nombre.toLowerCase().startsWith(hoy));
+  return deHoy >= 0 ? deHoy : 0;
 }
+
+// Arranque: nombre del cliente, opciones del selector y, si no hay sesión iniciada, el login
+(async function arrancar() {
+  document.getElementById('cliente').textContent = CLIENTE;
+  document.getElementById('selector-etapa').innerHTML = RUTINAS
+    .map(r => `<option value="${r.id}">${r.etapa}</option>`).join('');
+  limpiarSesionesViejas();
+  // Una sola vez al pasar a esta versión: la página vieja nunca borraba lo anotado, así que
+  // se descarta todo lo que no sea de una sesión en curso (lo de antes ya llegó por WhatsApp).
+  if (!leerLocal('limpieza-v2', false)) {
+    const abiertas = Object.keys(sesionesAbiertas);
+    Object.keys(borrador).forEach(id => { if (!abiertas.some(c => id.startsWith(c + '-'))) delete borrador[id]; });
+    guardarLocal('registro-rutina', borrador);
+    guardarLocal('limpieza-v2', true);
+  }
+  if (location.hash === '#biblioteca') {
+    document.getElementById('etapa-subtitulo').textContent = 'Vista del entrenador';
+    document.getElementById('cliente').textContent = 'Biblioteca de ejercicios';
+    document.getElementById('selector-etapa').hidden = true;
+    mostrarBiblioteca();
+    return;
+  }
+  if (!db) {
+    // Sin conexión con la base (ej.: no cargó la librería): la app funciona igual y queda el resumen por WhatsApp
+    elegirEtapa(RUTINAS[0].id);
+    document.getElementById('estado-guardado').textContent = '⚠ Sin conexión con la base: usá el resumen por WhatsApp';
+    return;
+  }
+  const { data } = await db.auth.getSession();
+  if (data.session) entrar(data.session.user); else mostrarLogin();
+})();
 </script>
 </body>
 </html>
