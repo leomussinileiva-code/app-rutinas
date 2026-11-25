@@ -173,7 +173,7 @@
 <nav class="tabs" id="tabs"></nav>
 <main id="contenido"></main>
 <!-- Número de versión: cambia en cada subida. Sirve para saber si el navegador muestra la última (caché). -->
-<footer class="version">v. 25/11 · 00:30</footer>
+<footer class="version">v. 26/11 · 01:00</footer>
 
 <script>
 /* =========================================================
@@ -1912,6 +1912,80 @@ const BIBLIOTECA = {
       ]
     },
     revisar: true
+  },
+  "copenhagen-plank": {
+    nombre: "Copenhagen plank",
+    categoria: "core",
+    patron: ["core antiflexión lateral"],
+    musculos: "Aductores, oblicuos, glúteo medio",
+    material: ["banco"],
+    precauciones: { etiquetas: [], nota: "Si molesta la ingle, apoyá la rodilla más cerca del borde del banco (palanca más corta) o bajá el tiempo." },
+    videos: [],
+    descripcion: {
+      musculos: "Aductores (cara interna del muslo) y zona media lateral. Protege la ingle, muy expuesta en el fútbol.",
+      pasos: [
+        "De costado, apoyado en el antebrazo, con el codo debajo del hombro.",
+        "La rodilla de la pierna de arriba va sobre el banco; la pierna de abajo queda libre.",
+        "Subí la cadera hasta que el cuerpo quede en línea y sostené el tiempo indicado. Después, del otro lado."
+      ]
+    },
+    revisar: true
+  },
+  "remo-pecho-apoyado-mancuernas": {
+    nombre: "Remo con pecho apoyado",
+    familia: "remo",
+    categoria: "fuerza",
+    patron: ["tracción horizontal"],
+    musculos: "Dorsal, romboides, trapecio medio",
+    material: ["banco", "mancuernas"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Espalda (dorsal y zona media de la espalda) sin cargar la zona lumbar, porque el pecho queda apoyado.",
+      pasos: [
+        "Banco inclinado a 30-45°, boca abajo con el pecho apoyado. Una mancuerna en cada mano, palmas mirándose.",
+        "Tirá con los codos pegados al cuerpo, hacia la cadera, y juntá las escápulas arriba (1 s de pausa).",
+        "Bajá controlando hasta estirar los brazos. El pecho no se despega del banco en ningún momento."
+      ]
+    },
+    revisar: true
+  },
+  "pullover-polea-alta": {
+    nombre: "Pullover en polea alta",
+    categoria: "fuerza",
+    patron: ["tracción vertical"],
+    musculos: "Dorsal ancho",
+    material: ["polea", "barra", "cuerda"],
+    precauciones: { etiquetas: ["hombro"], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Dorsal ancho, sin que trabajen los bíceps (los codos no se doblan).",
+      pasos: [
+        "Parado frente a la polea alta, con una barra recta o una cuerda. Inclinate un poco hacia adelante con la espalda recta.",
+        "Con los brazos casi estirados, llevá la barra desde arriba hasta los muslos. Los codos no se doblan durante el movimiento.",
+        "Subí despacio hasta sentir el estiramiento debajo de las axilas."
+      ]
+    },
+    revisar: true
+  },
+  "curl-inclinado-mancuernas": {
+    nombre: "Curl inclinado con mancuernas",
+    familia: "curl-biceps",
+    categoria: "fuerza",
+    patron: ["flexión de codo"],
+    musculos: "Bíceps",
+    material: ["banco", "mancuernas"],
+    precauciones: { etiquetas: ["hombro"], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Bíceps en posición estirada (el brazo queda por detrás del cuerpo).",
+      pasos: [
+        "Sentado en un banco con el respaldo a 45-60°, la espalda bien apoyada y los brazos colgando por detrás del cuerpo.",
+        "Subí las mancuernas sin adelantar los codos.",
+        "Abajo, estirá del todo: ahí es donde más trabaja el bíceps."
+      ]
+    },
+    revisar: true
   }
 };
 
@@ -2299,6 +2373,162 @@ const ETAPA6 = {
             { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna", nota: "Talón hacia el glúteo, rodillas juntas, abdomen firme sin arquear la espalda." },
             { id: "estiramiento-flexor-cadera", dosis: "30 s por pierna", nota: "Rodilla de atrás apoyada, apretá el glúteo de esa pierna y llevá la cadera un poco adelante." },
             { id: "estiramiento-isquios-sentado", dosis: "30 s por pierna", nota: "Pierna estirada, inclinate desde la cadera con la espalda larga." }
+          ]
+        }
+      ]
+    },
+    {
+      nombre: "Jueves · Trap bar, espalda y bíceps",
+      preguntaCierre: "¿Qué ejercicio te costó más? ¿Cómo te sentiste en general? ¿Alguna molestia?",
+      reglas: [
+        "RIR: al terminar cada serie preguntate ¿cuántas más me salían con buena técnica? Ese número es el que anotás. RIR 2 = las últimas 2 reps tienen que costarte de verdad. Si terminás la serie y sentís que hacías 4 o 5 más, la carga es baja: subila en la serie siguiente.",
+        "Anotá siempre la carga y las reps de cada serie.",
+        "Si aparece dolor lumbar o en una articulación (no cansancio muscular), parás el ejercicio, lo anotás y lo revisamos."
+      ],
+      bloques: [
+        {
+          nombre: "1 · Entrada en calor",
+          ejercicios: [
+            { id: "bici", dosis: "5 min", nota: "Ritmo suave, que vaya subiendo." },
+            { id: "gato-vaca", dosis: "5 ciclos", nota: "En cuatro apoyos, redondeá la espalda llevando el ombligo hacia arriba y después hundila suave mirando al frente. Lento y sin forzar los extremos." },
+            { id: "worlds-greatest-stretch", dosis: "4 por lado", nota: "Zancada profunda, manos por dentro del pie adelantado y cadera baja. Rotá el tronco hacia la pierna de adelante llevando el brazo hacia el techo. Volvé y cambiá de lado." },
+            { id: "copenhagen-plank", nuevo: true, dosis: "2 × 15-20 s por lado" },
+            { id: "bisagra-cadera-sin-peso", dosis: "× 10", nota: "Rodillas apenas flexionadas, llevá la cadera hacia atrás con la espalda recta y volvé apretando los glúteos." },
+            { id: "dislocaciones-banda", dosis: "× 10", nota: "Banda ancha, brazos estirados: desde adelante, por encima de la cabeza, hasta detrás del cuerpo, y volvé (ida y vuelta = 1). Si se te doblan los codos, abrí más el agarre." },
+            { id: "activacion-dorsal-banda", dosis: "× 12", nota: "Banda en el poste a la altura de la cabeza, brazos estirados: bajala hasta los muslos sin doblar los codos." },
+            { id: "pull-apart-banda", dosis: "× 12", nota: "Brazos estirados al frente, a la altura del pecho: separá la banda juntando las escápulas." }
+          ]
+        },
+        {
+          nombre: "2 · Peso muerto con trap bar",
+          principal: true,
+          ejercicios: [
+            {
+              id: "peso-muerto-trap-bar",
+              destacado: true,
+              series: "4",
+              reps: "6",
+              carga: "110 kg",
+              rir: "3",
+              descanso: "2-3 min",
+              previo: "Aproximaciones (no se anotan): 60 kg × 6 · 80 kg × 3 · 95 kg × 1. <br><b>Después de la 1.ª serie</b> (¿cuántas más me salían?): 4 o más → subí a 120 kg · 2 o 3 → seguí con 110 kg · 1 o ninguna → bajá a 100 kg. <br>Anotá el <b>peso total, con la barra incluida</b>. Si no sabés cuánto pesa la barra, anotá solo los discos y marcalo abajo.",
+              indicaciones: [
+                "Antes de levantar, apretá la barra y \"guardá las axilas\", como si quisieras doblar las asas hacia afuera: la espalda tiene que estar firme antes de que la barra despegue.",
+                "Empujá el piso con las piernas. La cadera y los hombros suben juntos.",
+                "Arriba, parado derecho con los glúteos apretados, sin echarte hacia atrás.",
+                "Nunca al fallo. Si la espalda se redondea, la serie termina ahí."
+              ],
+              anotar: [
+                { etiqueta: "Después de la 1.ª serie: ¿con cuánto seguiste?", opciones: ["120 kg", "110 kg", "100 kg"] },
+                { etiqueta: "Los kg que anotaste…", opciones: ["Incluyen la barra", "Son solo los discos"] },
+                { etiqueta: "Molestia en la zona lumbar (0 a 10)", placeholder: "0 = nada" }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "3 · Espalda",
+          nota: "<b>Agarre.</b> Después de la trap bar el antebrazo llega cansado. Si en el jalón o en los remos sentís que se te escapa la barra antes de que se canse la espalda, usá straps en esos ejercicios.",
+          principal: true,
+          ejercicios: [
+            {
+              id: "jalon-pecho",
+              series: "4",
+              reps: "8-10",
+              carga: "50 kg",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: [
+                "Pecho arriba. Llevá la barra hacia la parte alta del pecho tirando con los codos hacia abajo y hacia atrás.",
+                "Subí controlando hasta estirar los brazos del todo, sin soltar de golpe."
+              ]
+            },
+            {
+              id: "remo-pecho-apoyado-mancuernas",
+              series: "3",
+              reps: "10",
+              carga: "20 kg c/u",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: [
+                "Banco inclinado a 30-45°, boca abajo con el pecho apoyado. Palmas mirándose.",
+                "Tirá con los codos pegados al cuerpo, hacia la cadera, y juntá las escápulas arriba (1 s de pausa).",
+                "El pecho no se despega del banco en ningún momento."
+              ]
+            },
+            {
+              id: "remo-polea-baja-barra-ancha",
+              series: "3",
+              reps: "12",
+              carga: "45 kg",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: [
+                "Sentado con el torso quieto, sin balancearte.",
+                "Tirá hacia el pecho con los codos abiertos, a la altura de los hombros.",
+                "Pausa de 1 s juntando las escápulas."
+              ]
+            },
+            {
+              id: "pullover-polea-alta",
+              series: "3",
+              reps: "12-15",
+              carga: "20-25 kg (probá en la 1.ª serie)",
+              rir: "2",
+              descanso: "90 s",
+              indicaciones: [
+                "Barra recta o cuerda. Inclinate un poco hacia adelante con la espalda recta.",
+                "Con los brazos casi estirados, llevá la barra desde arriba hasta los muslos. Los codos no se doblan.",
+                "Subí despacio hasta sentir el estiramiento debajo de las axilas."
+              ],
+              anotar: [{ etiqueta: "¿Usaste straps en la espalda?", opciones: ["No", "Sí"] }]
+            }
+          ]
+        },
+        {
+          nombre: "4 · Bíceps · serie compuesta",
+          nota: "Hacés A1, pasás directo a A2 sin descanso, y recién ahí descansás 90 s. Son 3 vueltas.",
+          principal: true,
+          cierre: {
+            titulo: "Cuándo subir la carga (espalda y bíceps)",
+            texto: "Si completás todas las series en el máximo de repeticiones (por ejemplo, 4 × 10 en el jalón) y las últimas 2 te costaron, la semana que viene subís la carga. Si no llegás, mantenés la carga e intentás sumar repeticiones."
+          },
+          ejercicios: [
+            {
+              id: "curl-barra-ez",
+              grupo: "A1",
+              series: "3",
+              reps: "8-10",
+              carga: "25 kg",
+              rir: "2",
+              descanso: "Sin descanso → A2",
+              indicaciones: ["Codos quietos al costado del cuerpo, sin balancear el torso. Bajá controlando hasta estirar los brazos."]
+            },
+            {
+              id: "curl-inclinado-mancuernas",
+              grupo: "A2",
+              series: "3",
+              reps: "10-12",
+              carga: "10 kg c/u",
+              rir: "2",
+              descanso: "90 s al terminar el par",
+              indicaciones: [
+                "Respaldo a 45-60°, espalda bien apoyada y brazos colgando por detrás del cuerpo.",
+                "Subí sin adelantar los codos. Abajo, estirá del todo: ahí es donde más trabaja el bíceps."
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "5 · Estiramientos",
+          nota: "30 s cada uno.",
+          ejercicios: [
+            { id: "estiramiento-dorsal-banco", dosis: "30 s", nota: "Manos sobre el banco, cadera hacia atrás y el pecho bajando." },
+            { id: "estiramiento-biceps-pared", dosis: "30 s por brazo", nota: "Palma apoyada en la pared a la altura del hombro, brazo estirado; girá el cuerpo hacia el otro lado." },
+            { id: "estiramiento-pectoral-pared", dosis: "30 s por lado", nota: "Antebrazo en la pared con el codo a la altura del hombro; girá el torso hacia el otro lado." },
+            { id: "estiramiento-isquios-sentado", dosis: "30 s", nota: "Piernas estiradas, llevá el pecho hacia adelante con la espalda larga, sin rebotes." },
+            { id: "estiramiento-figure-four", dosis: "30 s por lado", nota: "Boca arriba, un tobillo sobre la rodilla contraria; acercá las piernas al pecho." },
+            { id: "estiramiento-postura-nino", dosis: "30 s", nota: "Sentado sobre los talones, brazos estirados hacia adelante en el piso." }
           ]
         }
       ]
@@ -3378,7 +3608,7 @@ function mostrarCierre(indice) {
   }
   html += `
     <div class="tarjeta">
-      <div class="registro-titulo">¿Cómo te sentiste? ¿Alguna molestia?</div>
+      <div class="registro-titulo">${RUTINA.dias[indice].preguntaCierre || '¿Cómo te sentiste? ¿Alguna molestia?'}</div>
       ${RUTINA.dias[indice].alerta ? `<p class="detalle">⚠ ${RUTINA.dias[indice].alerta.texto}</p>` : ''}
       <textarea placeholder="Ej: buena sesión, banca cómoda, algo de carga en el hombro izquierdo…" data-id="${base}-nota"></textarea>
       <button class="boton" onclick="terminarSesion(${indice})">Terminar sesión</button>
