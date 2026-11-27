@@ -173,7 +173,7 @@
 <nav class="tabs" id="tabs"></nav>
 <main id="contenido"></main>
 <!-- Número de versión: cambia en cada subida. Sirve para saber si el navegador muestra la última (caché). -->
-<footer class="version">v. 26/11 · 01:00</footer>
+<footer class="version">v. 26/11 · 23:30</footer>
 
 <script>
 /* =========================================================
@@ -1986,6 +1986,104 @@ const BIBLIOTECA = {
       ]
     },
     revisar: true
+  },
+  "sentadilla-frontal": {
+    nombre: "Sentadilla frontal",
+    familia: "sentadilla",
+    categoria: "fuerza",
+    patron: ["sentadilla"],
+    musculos: "Cuádriceps, glúteos; zona media y espalda alta",
+    material: ["barra", "rack"],
+    precauciones: { etiquetas: ["lumbar", "muñeca"], nota: "Si los codos se caen o sentís la zona lumbar, cortá la serie y bajá la carga. Si duelen las muñecas, agarre B (brazos cruzados)." },
+    videos: [],
+    descripcion: {
+      musculos: "Cuádriceps y glúteos, con más trabajo de la zona media y la espalda alta que la sentadilla con la barra atrás (el tronco queda más vertical).",
+      pasos: [
+        "La barra apoya en la parte de adelante de los hombros, no en las manos.",
+        "Codos altos, apuntando hacia adelante, toda la serie.",
+        "Abdomen apretado antes de bajar, como si te fueran a pegar en la panza.",
+        "Tronco lo más vertical posible. Bajá hasta donde mantengas la espalda firme y subí empujando el piso."
+      ],
+      secciones: [
+        { titulo: "Agarre A", texto: "Dedos debajo de la barra, a lo ancho de los hombros." },
+        { titulo: "Agarre B", texto: "Brazos cruzados, cada mano sobre la barra en el hombro contrario. Usalo si te duelen las muñecas o no llegás a tener los codos altos." }
+      ]
+    },
+    revisar: true
+  },
+  "rodilla-pecho-caminando": {
+    nombre: "Rodilla al pecho caminando",
+    categoria: "movilidad",
+    patron: [],
+    musculos: "Glúteos e isquiosurales de la pierna que sube; flexor de cadera de la que queda apoyada",
+    material: ["peso corporal"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Movilizar la cadera y activar el equilibrio antes de entrenar.",
+      pasos: [
+        "Abrazá una rodilla y llevala al pecho.",
+        "Quedate 1 s, avanzá un paso y repetí con la otra.",
+        "Tronco derecho: no redondees la espalda para llegar más arriba."
+      ]
+    },
+    revisar: true
+  },
+  "paseo-granjero": {
+    nombre: "Paseo del granjero",
+    categoria: "fuerza",
+    patron: ["acarreo"],
+    musculos: "Agarre (antebrazos), trapecio, zona media",
+    material: ["pesa rusa"],
+    precauciones: { etiquetas: [], nota: "" },
+    videos: [],
+    descripcion: {
+      musculos: "Agarre, hombros estables y zona media que no deja inclinar el tronco.",
+      pasos: [
+        "Una pesa en cada mano, a los costados del cuerpo.",
+        "Hombros abajo y atrás, tronco derecho sin inclinarte para ningún lado.",
+        "Caminá con pasos cortos.",
+        "Si se te escapan las pesas, apoyalas, sacudí las manos y seguí."
+      ]
+    },
+    revisar: true
+  },
+  "subida-cajon-mancuernas": {
+    nombre: "Subida al cajón con mancuernas",
+    categoria: "fuerza",
+    patron: ["zancada"],
+    musculos: "Cuádriceps y glúteos de la pierna que sube",
+    material: ["mancuernas", "cajón"],
+    precauciones: { etiquetas: ["rodilla"], nota: "La rodilla de la pierna que sube apunta a la punta del pie, sin irse hacia adentro." },
+    videos: [],
+    descripcion: {
+      musculos: "Cuádriceps y glúteos, una pierna por vez.",
+      pasos: [
+        "Apoyá el pie derecho entero en el cajón y subí empujando con ese talón. El izquierdo acompaña, sin impulsarte con él.",
+        "Para bajar, apoyá primero el pie izquierdo en el piso, despacio, frenando con la pierna derecha.",
+        "La siguiente subida la empezás con la izquierda.",
+        "La rodilla de la pierna que sube tiene que apuntar a la punta del pie, sin irse hacia adentro."
+      ]
+    },
+    revisar: true
+  },
+  "recogimiento-rodillas-fitball": {
+    nombre: "Recogimiento de rodillas en fitball",
+    categoria: "core",
+    patron: ["core antiextensión"],
+    musculos: "Zona media, flexores de cadera",
+    material: ["fitball"],
+    precauciones: { etiquetas: ["lumbar"], nota: "Si sentís la zona lumbar, pará." },
+    videos: [],
+    descripcion: {
+      musculos: "Zona media: el tronco no se hunde mientras las piernas se mueven.",
+      pasos: [
+        "Plancha con las manos en el piso y los empeines sobre la pelota.",
+        "Llevá las rodillas hacia el pecho haciendo rodar la pelota y volvé despacio.",
+        "Al estirar las piernas, la cadera no se hunde."
+      ]
+    },
+    revisar: true
   }
 };
 
@@ -2529,6 +2627,164 @@ const ETAPA6 = {
             { id: "estiramiento-isquios-sentado", dosis: "30 s", nota: "Piernas estiradas, llevá el pecho hacia adelante con la espalda larga, sin rebotes." },
             { id: "estiramiento-figure-four", dosis: "30 s por lado", nota: "Boca arriba, un tobillo sobre la rodilla contraria; acercá las piernas al pecho." },
             { id: "estiramiento-postura-nino", dosis: "30 s", nota: "Sentado sobre los talones, brazos estirados hacia adelante en el piso." }
+          ]
+        }
+      ]
+    },
+    {
+      nombre: "Viernes · Sentadilla frontal, press militar y WOD",
+      preguntaCierre: "¿Qué te costó más? ¿Cómo te sentiste en general? ¿Alguna molestia?",
+      reglas: [
+        "Cómo medir el esfuerzo (RIR = repeticiones en reserva): al terminar cada serie preguntate ¿cuántas más me salían con buena técnica? Esas son las que dejaste en reserva. RIR 3 = te quedaban 3.",
+        "Hoy anotás el RIR en cada serie, no solo en la última.",
+        "Usá el cronómetro del celular para los descansos.",
+        "Si aparece dolor lumbar o en una articulación (no cansancio muscular), parás el ejercicio, lo anotás y lo revisamos."
+      ],
+      bloques: [
+        {
+          nombre: "1 · Entrada en calor",
+          ejercicios: [
+            { id: "bici", dosis: "5 min", nota: "Arrancá suave y subí el ritmo de a poco." },
+            { id: "rodilla-pecho-caminando", nuevo: true, dosis: "10 pasos (5 por pierna)" },
+            { id: "walking-spiderman", dosis: "10 pasos", nota: "Zancada larga hacia adelante, apoyá las manos en el piso por dentro del pie de adelante y bajá el codo hacia el empeine. Volvé a pararte y avanzá con la otra pierna." },
+            { id: "caminata-elefante", dosis: "10 pasos", nota: "Manos y pies en el piso, cadera bien arriba (forma de V invertida), piernas lo más estiradas posible. Avanzá caminando sin bajar la cadera." },
+            {
+              id: "sentadilla-profunda-disco",
+              nombre: "Sentadilla profunda con disco, balanceos y press",
+              dosis: "8 balanceos + 5 press",
+              nota: "Disco de 5 kg en el pecho. Bajá a la sentadilla profunda y hacé 8 balanceos suaves. Después quedate abajo con el disco en el pecho y subilo por encima de la cabeza, despacio, 5 veces. El disco tiene que quedar arriba de tu cabeza, no adelante. Si para subirlo tenés que inclinar el tronco hacia adelante o sentís que se te redondea la espalda baja, subilo solo hasta la altura de la frente."
+            }
+          ],
+          cierre: {
+            titulo: "🎥 Grabate",
+            texto: "Mandame un video de costado de la sentadilla profunda con disco (los balanceos y los press)."
+          }
+        },
+        {
+          nombre: "2 · Sentadilla frontal",
+          principal: true,
+          nota: "<b>Esta sentadilla va al día siguiente del peso muerto: nunca cerca del fallo.</b> Si los codos se te caen o sentís la zona lumbar, cortá la serie y bajá la carga.",
+          ejercicios: [
+            {
+              id: "sentadilla-frontal",
+              nuevo: true,
+              destacado: true,
+              series: "3",
+              reps: "8",
+              carga: "60-75 kg",
+              rir: "3",
+              rirPorSerie: true,
+              descanso: "2-3 min",
+              previo: "Aproximaciones (no se anotan): barra sola × 8 (técnica) · 40 kg × 5 · 50 kg × 3. <br><b>1.ª serie: 60 kg × 8.</b> <br><b>Después de cada serie</b> (¿cuántas más me salían?): 5 o más → +10 kg · 4 → +5 kg · 3 → mantené: ese es tu peso · 2 o menos → −5 kg. <br><b>Tope de hoy: 75 kg.</b> El peso con el que terminás es el punto de partida de la semana que viene.",
+              indicaciones: [
+                "La barra apoya en la parte de adelante de los hombros, no en las manos.",
+                "Codos altos, apuntando hacia adelante, toda la serie.",
+                "Tronco lo más vertical posible. Bajá hasta donde mantengas la espalda firme.",
+                "Abdomen apretado antes de bajar, como si te fueran a pegar en la panza."
+              ],
+              anotar: [
+                { etiqueta: "¿Qué agarre usaste?", opciones: ["A · dedos debajo", "B · brazos cruzados"] },
+                { etiqueta: "Molestia en la zona lumbar (0 a 10)", placeholder: "0 = nada" }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "3 · Press militar",
+          principal: true,
+          nota: "Si para subir la barra arqueás la espalda baja, bajá la carga. Es la señal de que el hombro no llega y la espalda está compensando.",
+          ejercicios: [
+            {
+              id: "press-militar-barra",
+              series: "4",
+              reps: "6",
+              carga: "40 kg",
+              rir: "3",
+              rirPorSerie: true,
+              descanso: "2-3 min",
+              previo: "Aproximaciones (no se anotan): 20 kg × 8 · 30 kg × 4 · 35 kg × 2. <br><b>Después de la 1.ª serie</b> (¿cuántas más me salían?): 4 o más → 42,5 kg · 2 o 3 → 40 kg · 1 o ninguna → 37,5 kg.",
+              indicaciones: [
+                "De pie, barra en la parte alta del pecho, manos un poco más abiertas que los hombros.",
+                "Glúteos y abdomen apretados, costillas abajo antes de empujar.",
+                "Empujá recto hacia arriba: la cabeza \"pasa por la ventana\" cuando la barra sube.",
+                "Sin impulso de piernas."
+              ],
+              anotar: [
+                { etiqueta: "Después de la 1.ª serie: ¿con cuánto seguiste?", opciones: ["42,5 kg", "40 kg", "37,5 kg"] }
+              ]
+            }
+          ]
+        },
+        {
+          nombre: "4 · WOD · 40 s / 20 s · 15 min",
+          nota: "Cada minuto cambiás de estación: 40 s de trabajo y 20 s para descansar y pasar a la siguiente. Las 3 estaciones son una vuelta; hacés <b>5 vueltas</b>. Antes de empezar, dejá las pesas y el cajón al lado de la bici: los 20 s incluyen el cambio.",
+          reglas: [
+            "<b>Pasada previa:</b> hacé una vuelta completa a ritmo moderado para agarrar ritmo (bici cómoda, el mismo peso en el paseo y 4 subidas). Descansá 1-2 min y arrancá el WOD."
+          ],
+          ejercicios: [
+            {
+              id: "bici",
+              nombre: "Minuto 1 · Bici fuerte",
+              dosis: "40 s",
+              nota: "Esfuerzo 8-9 sobre 10: un ritmo que podés sostener los 40 s pero que no te deja hablar. Las 5 vueltas tienen que salir parecidas: si arrancás a tope y después caen, saliste demasiado fuerte.",
+              anotar: [
+                { etiqueta: "Calorías · vuelta 1", placeholder: "cal" },
+                { etiqueta: "Calorías · vuelta 2", placeholder: "cal" },
+                { etiqueta: "Calorías · vuelta 3", placeholder: "cal" },
+                { etiqueta: "Calorías · vuelta 4", placeholder: "cal" },
+                { etiqueta: "Calorías · vuelta 5", placeholder: "cal" }
+              ]
+            },
+            {
+              id: "paseo-granjero",
+              nuevo: true,
+              nombre: "Minuto 2 · Paseo del granjero",
+              dosis: "40 s caminando · pesa rusa de 24 kg en cada mano",
+              anotar: [
+                { etiqueta: "Kg de cada pesa", placeholder: "24" },
+                { etiqueta: "¿En qué vueltas tuviste que apoyar?", placeholder: "Ej: ninguna · 4 y 5" }
+              ]
+            },
+            {
+              id: "subida-cajon-mancuernas",
+              nuevo: true,
+              nombre: "Minuto 3 · Subida al cajón con mancuernas",
+              dosis: "8 subidas (4 con cada pierna) · mancuernas de 10 kg · cajón o banco de 40-50 cm",
+              nota: "Alternando piernas. Cuando terminás, descansás lo que quede del minuto.",
+              anotar: [
+                { etiqueta: "Kg de cada mancuerna", placeholder: "10" }
+              ]
+            }
+          ],
+          cierre: {
+            titulo: "🎥 Grabate",
+            texto: "Mandame un video de las subidas al cajón: una vuelta de frente y otra de costado."
+          }
+        },
+        {
+          nombre: "5 · Abdominales",
+          nota: "3 vueltas: A1 y A2 seguidos, y 60 s de descanso entre vueltas.",
+          ejercicios: [
+            { id: "stir-the-pot", grupo: "A1", dosis: "6 círculos por dirección", nota: "Plancha con los antebrazos apoyados en el fitball. Glúteos apretados. Dibujá círculos chicos con los codos, como si revolvieras una olla. La cadera no se mueve." },
+            {
+              id: "recogimiento-rodillas-fitball",
+              nuevo: true,
+              grupo: "A2",
+              dosis: "10",
+              anotar: [{ etiqueta: "¿Completaste las 3 vueltas?", opciones: ["Sí", "No"] }]
+            }
+          ]
+        },
+        {
+          nombre: "6 · Estiramientos",
+          nota: "30 s cada uno.",
+          ejercicios: [
+            { id: "estiramiento-cuadriceps-pared", dosis: "30 s por pierna" },
+            { id: "estiramiento-flexor-cadera", dosis: "30 s por lado", nota: "Pelvis hacia adentro." },
+            { id: "estiramiento-gemelo-pared", dosis: "30 s cada posición, por pierna", nota: "Rodilla estirada (gemelo) y después rodilla flexionada (sóleo)." },
+            { id: "estiramiento-dorsal-banco", dosis: "30 s" },
+            { id: "estiramiento-pectoral-pared", dosis: "30 s por lado" },
+            { id: "estiramiento-postura-nino", dosis: "30 s" }
           ]
         }
       ]
